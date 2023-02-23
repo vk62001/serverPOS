@@ -16,23 +16,6 @@ const getTable =  async (table) => {
     poolConnection.close();
 }
 
-const updateApertura = async (objApertura) => {
-    //exec sqsp_ComunicacionSQ 2, 'AperturasTiendas', 0
-    //revisar no hay conexión
-    //return  //salvar el log false
-    //si salvar central
-        
-
-        try{
-            //salvar el log true
-            // consumir api
-            //update central
-        }catch(err){    
-            //salvar el log false
-        }
-}
-
 module.exports = {
     getTable,
-    updateApertura
 }
