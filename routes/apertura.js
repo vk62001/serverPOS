@@ -1,4 +1,4 @@
-const { apertura } = require('../controllers/apertura');
+const { apertura, updateApertura } = require('../controllers/apertura');
 
 const router = require('express').Router();
 
@@ -9,9 +9,7 @@ router.get('/', (req, res)=>{
 
 router.post('/', apertura);
 
-router.put('/', (req, res)=>{
-    res.send({resp:'update'});
-});
+router.put('/', updateApertura);
 
 router.delete('/', (req, res)=>{
     res.send({resp:'delete'});

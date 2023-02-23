@@ -2,7 +2,7 @@
 
 const sql = require('mssql');
 const config = require('./config');
-
+const axios = require('axios');
 
 const getTable =  async (table) => {
     const  poolConnection = await sql.connect(config);
@@ -16,7 +16,7 @@ const getTable =  async (table) => {
     poolConnection.close();
 }
 
-const updateApertura = () => {
+const updateApertura = async (objApertura) => {
     //exec sqsp_ComunicacionSQ 2, 'AperturasTiendas', 0
     //revisar no hay conexión
     //return  //salvar el log false
@@ -25,6 +25,8 @@ const updateApertura = () => {
 
         try{
             //salvar el log true
+            // consumir api
+            //update central
         }catch(err){    
             //salvar el log false
         }
