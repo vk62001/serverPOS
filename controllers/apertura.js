@@ -10,55 +10,34 @@ const apertura = async (req, res) => {
     res.status(200).send({ ok: true });
     return;
   }
-
   setTimeout(async () => {
-    const objData = await axios
-      .get(`${URILocal}api/v1/AperturasTiendas/${id}`)
-      .then((res) => {
-        return res.data.datas;
-      })
-      .catch((err) => console.log(err));
-
+    const objData = await getInfo(id);
     console.log(objData, "-");
-    const config = {
-      method: "post",
-      url: `${URICentral}api/v1/AperturasTiendas/`,
-      headers: {
-        Authorization: `Basic ${process.env.credentials}`,
-        "Content-Type": "application/json",
-      },
-      data: objData[0],
-    };
 
     setTimeout(() => {
-      // axios(config)
-      //   .then(function (response) {
-      //     console.log(JSON.stringify(response.data, "--"));
-      //     console.log("log salvado");
-      //   })
-      //   .catch(function (error) {
-      //     console.log(error, "errado");
-      //     // res.status(200).send({ok:true})
-      //   });
-      axiosUpdateApertura(objData[0]);
+      axiosInsertApertura(objData[0]);
     }, 200);
   }, 500);
 
   res.status(200).send({ ok: true });
 };
 
+
 const updateApertura = async (req, res) => {
   const { id } = req.body;
-
+  console.log(id)
   if (id === undefined) {
     res.status(200).send({ ok: true });
     return;
   };
-  const objData = await getInfo(id);
+  setTimeout(async () => {
+    const objData = await getInfo(id);
+    console.log(objData, "-");
 
-  setTimeout(() => {
-    axiosUpdateApertura(id, objData[0]);
-  }, 200);
+    setTimeout(() => {
+      axiosUpdateApertura(id, objData[0]);
+    }, 200);
+  }, 500);
 
   res.status(200).send({ ok: true });
 };
