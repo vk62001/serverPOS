@@ -1,5 +1,5 @@
 const { default: axios } = require("axios");
-const { axiosUpdateApertura, getInfo } = require("../utils/axiosfn");
+const { axiosUpdateApertura, getInfo, axiosInsertApertura } = require("../utils/axiosfn");
 const URICentral = process.env.URi_central;
 const URILocal = process.env.URi_local;
 
@@ -15,7 +15,7 @@ const apertura = async (req, res) => {
     console.log(objData, "-");
 
     setTimeout(() => {
-      axiosInsertApertura(objData[0]);
+      axiosInsertApertura(objData[0], id);
     }, 200);
   }, 500);
 

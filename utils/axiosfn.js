@@ -7,24 +7,24 @@ const axiosUpdateApertura = async (id, obj) => {
     const { data } = await SDK.updateApertura(id, obj);
     //se salva el log
     console.log(data);
-    saveLog('AperturaCaja', id, data.message, 0, 0);
+    saveLog('AperturaCaja', id, data.message, 1, 0);
   } catch (err) {
     console.log(err.response.data);
     //se salva el log
-    saveLog('AperturaCaja', id, data.message, 1, 0);
+    saveLog('AperturaCaja', id, data.message, 0, 0);
   }
 };
 
-const axiosInsertApertura = async (obj) => {
+const axiosInsertApertura = async (obj, id) => {
   try {
     const { data } = await SDK.apertura(obj);
-    console.log(data.message);
-    saveLog('AperturaCaja', id, data.message, 0, 0);
+    console.log(data.message, '21');
+    saveLog('AperturaCaja', id, data.message, 1, 0);
     //se salva el log
   } catch (err) {
     console.log(err.response.data);
     //se salva el log
-    saveLog('AperturaCaja', id, data.message, 1, 0);
+    saveLog('AperturaCaja', id, data.message, 0, 0);
   }
 }
 
@@ -35,10 +35,23 @@ const getInfo = async (id) => {
   } catch (err) {
     console.log(err.response, '20')
   }
+};
+
+const getidTienda = async ()=>{
+  try{
+    const {data} =  await SDKLocal.getInfoTienda();
+    return data.datas[0].valor;
+    
+  }catch(err){
+    console.log(err);
+    return false
+  } 
 }
+
 
 module.exports = {
   axiosUpdateApertura,
   getInfo,
   axiosInsertApertura,
+  getidTienda
 };

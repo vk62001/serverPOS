@@ -7,6 +7,7 @@ const SDK = {
     updateApertura : function (id, data) {
         return APISQ.put(`api/v1/AperturasTiendas/${id}`, data)
     },
+    
 }
 
 module.exports = {
