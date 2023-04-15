@@ -5,7 +5,7 @@ const { getTable } = require("./SQLServer/SQL");
 const apiRouter = require("./routes");
 const { io } = require("socket.io-client");
 const { SDKLocal } = require("./SDK/SDKLocal");
-const { getidTienda } = require("./utils/axiosfn");
+const { getIdTienda } = require("./utils/axiosfn");
 // App setup
 const PORT = 5001;
 const app = express();
@@ -25,43 +25,42 @@ app.use(express.static("public"));
 app.use("/api/", apiRouter);
 
 app.get("/", async (req, res) => {
-  const query = await getTable("sq");
+  const query = await getTable("sqt_configuracion");
+  console.log(query);
   res.status(200).send({ data: query });
 });
 
 const useSocket = (idTienda) => {
   const URi = "http://localhost:5002";
 
-
   const socket = io.connect(URi, {
-    query:{
-      tienda:idTienda,
-      room:'zona_norte'
+    query: {
+      tienda: idTienda,
+      room: "zona_norte",
     },
     transports: ["websocket"],
     upgrade: false,
   });
-  
+
   socket.on("connect", async () => {
     console.log("connected");
     //id de tienda
   });
 
-  socket.on('getCountRegistrosPOS',async (e)=>{
-    console.log('pedimos tablas locales')
+  socket.on("getCountRegistrosPOS", async (e) => {
+    console.log("pedimos tablas locales");
     const datosTablas = await SDKLocal.getTablas();
-    socket.emit('setCountRegistros', {registros:datosTablas.data.data, e});
+    socket.emit("setCountRegistros", { registros: datosTablas.data.data, e });
   });
 
-  socket.emit('test');
-
+  socket.emit("test");
 };
 
 const start = async () => {
-  const idTienda = await getidTienda();
-  if(!idTienda)return
+  const idTienda = await getIdTienda();
+  console.log(idTienda);
+  if (!idTienda) return;
   useSocket(idTienda);
-}
+};
 
 start();
-

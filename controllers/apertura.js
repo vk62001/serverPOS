@@ -1,7 +1,8 @@
-const { default: axios } = require("axios");
-const { axiosUpdateApertura, getInfo, axiosInsertApertura } = require("../utils/axiosfn");
-const URICentral = process.env.URi_central;
-const URILocal = process.env.URi_local;
+const {
+  getInfo,
+  axiosInsertData,
+  axiosUpdateData,
+} = require("../utils/axiosfn");
 
 const apertura = async (req, res) => {
   const { code, id } = req.body;
@@ -11,31 +12,30 @@ const apertura = async (req, res) => {
     return;
   }
   setTimeout(async () => {
-    const objData = await getInfo(id);
+    const objData = await getInfo("AperturasTiendas", id);
     console.log(objData, "-");
 
     setTimeout(() => {
-      axiosInsertApertura(objData[0], id);
+      axiosInsertData("AperturasTiendas", objData[0], id);
     }, 200);
   }, 500);
 
   res.status(200).send({ ok: true });
 };
 
-
 const updateApertura = async (req, res) => {
   const { id } = req.body;
-  console.log(id)
+  console.log(id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
     return;
-  };
+  }
   setTimeout(async () => {
-    const objData = await getInfo(id);
+    const objData = await getInfo("AperturasTiendas", id);
     console.log(objData, "-");
 
     setTimeout(() => {
-      axiosUpdateApertura(id, objData[0]);
+      axiosUpdateData("AperturasTiendas", id, objData[0]);
     }, 200);
   }, 500);
 

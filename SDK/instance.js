@@ -1,17 +1,16 @@
-const axios = require('axios');
+const axios = require("axios");
 
 const URI = process.env.URi_central;
 
 console.log(URI);
 
-const APISQ =  axios.create({
-    baseURL:URI,
-    timeout: 5000,
-    headers :{
-        'Authorization': `Basic ${process.env.credentials}`, 
-        'Content-Type': 'application/json'
-    }
+const APISQ = axios.create({
+  baseURL: URI,
+  timeout: 5000,
+  headers: {
+    Authorization: `Basic ${process.env.credentials}`,
+    "Content-Type": "application/json",
+  },
 });
 
-
-module.exports =  APISQ;
+module.exports = APISQ;
