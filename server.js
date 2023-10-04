@@ -30,7 +30,7 @@ app.get("/", async (req, res) => {
 });
 
 const useSocket = (idTienda) => {
-  const URi = "http://localhost:5002";
+  const URi = "http://192.168.14.22:5002";
 
 
   const socket = io.connect(URi, {
@@ -59,7 +59,10 @@ const useSocket = (idTienda) => {
 
 const start = async () => {
   const idTienda = await getidTienda();
-  if(!idTienda)return
+  if(!idTienda){
+    //alerta si no hay conexión
+    return;
+  }
   useSocket(idTienda);
 }
 
