@@ -6,7 +6,7 @@ console.log(URI);
 
 const APISQLocal =  axios.create({
     baseURL:URI,
-    timeout: 1000,
+    timeout: 10000,
     // headers :{
     //     'Authorization': `Basic ${process.env.credentials}`, 
     //     'Content-Type': 'application/json'

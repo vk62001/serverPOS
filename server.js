@@ -30,8 +30,8 @@ app.get("/", async (req, res) => {
 });
 
 const useSocket = (idTienda) => {
-  const URi = "http://192.168.14.22:5002";
-
+  const URi = process.env.URi_sockets;
+  console.log(URi);
 
   const socket = io.connect(URi, {
     query:{
