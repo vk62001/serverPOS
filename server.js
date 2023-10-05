@@ -45,6 +45,7 @@ const useSocket = (idTienda) => {
   socket.on("connect", async () => {
     console.log("connected");
     //id de tienda
+    //revisar todos el log que no se haya
   });
 
   socket.on('getCountRegistrosPOS',async (e)=>{

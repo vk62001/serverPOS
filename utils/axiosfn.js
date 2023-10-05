@@ -41,7 +41,6 @@ const getInfo = async (id) => {
 const getidTienda = async ()=>{
   try{
     const {data} =  await SDKLocal.getInfoTienda();
-    // const {data} = await axios.get('http://localhost:8091/api/v1/Configuraciones');
     console.log(data, 'data')
 
     return data.datas[0].valor;

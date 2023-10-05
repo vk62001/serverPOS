@@ -1,7 +1,5 @@
-const { default: axios } = require("axios");
+
 const { axiosUpdateApertura, getInfo, axiosInsertApertura } = require("../utils/axiosfn");
-const URICentral = process.env.URi_central;
-const URILocal = process.env.URi_local;
 
 const apertura = async (req, res) => {
   const { code, id } = req.body;
