@@ -43,7 +43,7 @@ const useSocket = (idTienda) => {
   });
   
   socket.on("connect", async () => {
-    console.log("connected");
+    console.log("connected and start process to Merge on POS");
     //id de tienda
     //revisar todos el log que no se haya
   });
