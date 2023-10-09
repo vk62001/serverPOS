@@ -9,15 +9,18 @@ const axiosInsertData = async (endPoint, obj, id) => {
     saveLog(endPoint, id, data.message, 1, 0);
     //se salva el log
   } catch (err) {
-    console.log(err.response.data);
+    //err.code  === 'ECONNREFUSED' no hay conexion con server
+    console.log(err.code);
+    console.log(err.response.data, "12");
+
     //se salva el log
     saveLog(endPoint, id, data.message, 0, 0);
 
-    console.log(err.response);
-    console.log("Error updating" + err.response.status + " .");
-    if (err.response.status != 405) {
-      saveLog("RetirosCaja", id, data.message, 0, 0);
-    }
+    // console.log(err.response);
+    // console.log("Error updating" + err.response.status + " .");
+    // if (err.response.status != 405) {
+    //   saveLog("RetirosCaja", id, data.message, 0, 0);
+    // }
   }
 };
 
@@ -52,7 +55,7 @@ const getIdTienda = async () => {
     return false;
   }
 };
-
+/*
 const axiosUpdateApertura = async (id, obj) => {
   try {
     const { data } = await SDK.updateApertura(id, obj);
@@ -208,7 +211,7 @@ const axiosUpdateTicketsRemesas = async (id, obj) => {
     saveLog("TicketsRemesas", id, data.message, 0, 0);
   }
 };
-
+*/
 module.exports = {
   getInfo,
   getIdTienda,

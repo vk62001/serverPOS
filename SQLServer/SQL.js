@@ -9,8 +9,7 @@ const getTable = async (table) => {
   try {
     var resultSet = await poolConnection
       .request()
-      .query(`SELECT * FROM ${table}}`);
-
+      .query(`SELECT * FROM ${table}`);
     return resultSet;
   } catch (err) {
     console.error(err.message);

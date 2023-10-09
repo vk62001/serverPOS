@@ -5,6 +5,7 @@ const {
 } = require("../utils/axiosfn");
 
 const apertura = async (req, res) => {
+  console.log('post')
   const { code, id } = req.body;
   console.log(code, id);
   if (id === undefined) {
@@ -24,6 +25,7 @@ const apertura = async (req, res) => {
 };
 
 const updateApertura = async (req, res) => {
+  console.log('put')
   const { id } = req.body;
   console.log(id);
   if (id === undefined) {

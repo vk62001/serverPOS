@@ -26,12 +26,13 @@ app.use("/api/", apiRouter);
 
 app.get("/", async (req, res) => {
   const query = await getTable("sqt_configuracion");
-  console.log(query);
+  console.log(query,'--');
   res.status(200).send({ data: query });
 });
 
 const useSocket = (idTienda) => {
-  const URi = "http://localhost:5002";
+  const URi = process.env.URi_sockets;
+  console.log(URi);
 
   const socket = io.connect(URi, {
     query: {
@@ -58,8 +59,10 @@ const useSocket = (idTienda) => {
 
 const start = async () => {
   const idTienda = await getIdTienda();
-  console.log(idTienda);
-  if (!idTienda) return;
+  if(!idTienda){
+    //alerta si no hay conexión
+    return;
+  }
   useSocket(idTienda);
 };
 
