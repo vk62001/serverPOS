@@ -14,7 +14,8 @@ const facturasAjusteInventario = async (req, res) => {
   setTimeout(async () => {
     const objData = await getInfo("FacturasAjustesInventarios", id);
     console.log(objData, "-");
-
+    if(objData.length===0)
+      return;
     setTimeout(() => {
       axiosInsertData("FacturasAjustesInventarios", objData[0], id);
     }, 200);
@@ -33,7 +34,8 @@ const updateFacturasAjusteInventario = async (req, res) => {
   setTimeout(async () => {
     const objData = await getInfo("FacturasAjustesInventarios", id);
     console.log(objData, "-");
-
+    if(objData.length===0)
+      return;
     setTimeout(() => {
       axiosUpdateData("FacturasAjustesInventarios", id, objData[0]);
     }, 200);

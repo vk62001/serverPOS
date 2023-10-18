@@ -14,8 +14,10 @@ const apertura = async (req, res) => {
   }
   setTimeout(async () => {
     const objData = await getInfo("AperturasTiendas", id);
-    console.log(objData, "-");
+    console.log(objData,objData.length, "-", 18);
 
+    if(objData.length===0)
+      return;
     setTimeout(() => {
       axiosInsertData("AperturasTiendas", objData[0], id);
     }, 200);
@@ -34,8 +36,10 @@ const updateApertura = async (req, res) => {
   }
   setTimeout(async () => {
     const objData = await getInfo("AperturasTiendas", id);
-    console.log(objData, "-");
-
+    
+    console.log(objData, "- 37");
+    if(objData.length===0)
+      return;
     setTimeout(() => {
       axiosUpdateData("AperturasTiendas", id, objData[0]);
     }, 200);

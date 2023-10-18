@@ -12,6 +12,8 @@ const cupones = require("./cupones");
 const cajas = require("./cajas");
 const usuarios = require("./usuarios");
 const passwords = require("./passwords");
+const inventario = require("./inventario");
+const ajuste = require("./ajuste");
 
 const ventas = require("./ventas");
 
@@ -28,6 +30,8 @@ router.use("/cupones", cupones);
 router.use("/cajas", cajas);
 router.use("/usuarios", usuarios);
 router.use("/passwords", passwords);
+router.use("/inventario", inventario);
+router.use("/ajuste", ajuste);
 
 router.use("/ventas", ventas);
 
