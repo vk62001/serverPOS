@@ -14,6 +14,8 @@ const cupones = async (req, res) => {
     const objData = await getInfo("Cupones", id);
     console.log(objData, "-");
 
+    if(objData.length===0)
+      return;
     setTimeout(() => {
       axiosInsertData("Cupones", objData[0], id);
     }, 200);
@@ -33,6 +35,9 @@ const updateCupones = async (req, res) => {
     const objData = await getInfo("Cupones", id);
     console.log(objData, "-");
 
+    
+    if(objData.length===0)
+      return;
     setTimeout(() => {
       axiosUpdateData("Cupones", id, objData[0]);
     }, 200);

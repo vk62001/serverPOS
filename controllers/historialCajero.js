@@ -16,6 +16,8 @@ const historialCajero = async (req, res) => {
     const objData = await getInfo("HistorialesCajeros", id);
     console.log(objData, "-");
 
+    if(objData.length===0)
+      return;
     setTimeout(() => {
       axiosInsertData("HistorialesCajeros", objData[0], id);
     }, 200);
@@ -35,6 +37,8 @@ const updateHistorialCajero = async (req, res) => {
     const objData = await getInfo("HistorialesCajeros", id);
     console.log(objData, "-");
 
+    if(objData.length===0)
+      return;
     setTimeout(() => {
       axiosUpdateData("HistorialesCajeros", id, objData[0]);
     }, 200);

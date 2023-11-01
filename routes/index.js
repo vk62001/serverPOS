@@ -10,12 +10,15 @@ const facturaAjusteInventario = require("./facturasAjusteInventario");
 const existenciasTienda = require("./existenciasTiendas");
 const cupones = require("./cupones");
 const cajas = require("./cajas");
-const usuarios = require("./usuarios");
-const passwords = require("./passwords");
+const usuario = require("./usuario");
+const password = require("./password");
 const inventario = require("./inventario");
 const ajuste = require("./ajuste");
-
-const ventas = require("./ventas");
+const devolucion = require("./devolucion");
+const devolucionVenta = require("./devolucionVenta");
+const venta = require("./venta");
+const pedido = require("./pedido");
+const pedidoProveedor = require("./pedidoProveedor");
 
 router.use("/apertura", apertura);
 router.use("/deposito", deposito);
@@ -28,11 +31,14 @@ router.use("/facturaAjusteInventario", facturaAjusteInventario);
 router.use("/existenciasTienda", existenciasTienda);
 router.use("/cupones", cupones);
 router.use("/cajas", cajas);
-router.use("/usuarios", usuarios);
-router.use("/passwords", passwords);
+router.use("/usuario", usuario);
+router.use("/password", password);
 router.use("/inventario", inventario);
 router.use("/ajuste", ajuste);
-
-router.use("/ventas", ventas);
+router.use("/devolucion", devolucion);
+router.use("/devolucionVenta", devolucionVenta);
+router.use("/venta", venta);
+router.use("/pedido", pedido);
+router.use("/pedidoProveedor", pedidoProveedor);
 
 module.exports = router;

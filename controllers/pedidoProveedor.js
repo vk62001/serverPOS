@@ -4,7 +4,7 @@ const {
   axiosUpdateData,
 } = require("../utils/axiosfn");
 
-const ventas = async (req, res) => {
+const pedidoProveedor = async (req, res) => {
   const { code, id } = req.body;
   console.log(code, id);
   if (id === undefined) {
@@ -12,18 +12,19 @@ const ventas = async (req, res) => {
     return;
   }
   setTimeout(async () => {
-    const objData = await getInfo("Ventas", id);
+    const objData = await getInfo("PedidosProveedor", id);
     console.log(objData, "-");
 
+    if (objData.length === 0) return;
     setTimeout(() => {
-      axiosInsertData("Ventas", objData[0], id);
+      axiosInsertData("PedidosProveedor", objData[0], id);
     }, 200);
   }, 500);
 
   res.status(200).send({ ok: true });
 };
 
-const updateVentas = async (req, res) => {
+const updatePedidoProveedor = async (req, res) => {
   const { id } = req.body;
   console.log(id);
   if (id === undefined) {
@@ -31,11 +32,12 @@ const updateVentas = async (req, res) => {
     return;
   }
   setTimeout(async () => {
-    const objData = await getInfo("Ventas", id);
+    const objData = await getInfo("PedidosProveedor", id);
     console.log(objData, "-");
 
+    if (objData.length === 0) return;
     setTimeout(() => {
-      axiosUpdateData("Ventas", id, objData[0]);
+      axiosUpdateData("PedidosProveedor", id, objData[0]);
     }, 200);
   }, 500);
 
@@ -43,6 +45,6 @@ const updateVentas = async (req, res) => {
 };
 
 module.exports = {
-  ventas,
-  updateVentas,
+  pedidoProveedor,
+  updatePedidoProveedor,
 };

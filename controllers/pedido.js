@@ -4,7 +4,7 @@ const {
   axiosUpdateData,
 } = require("../utils/axiosfn");
 
-const passwords = async (req, res) => {
+const pedido = async (req, res) => {
   const { code, id } = req.body;
   console.log(code, id);
   if (id === undefined) {
@@ -12,18 +12,19 @@ const passwords = async (req, res) => {
     return;
   }
   setTimeout(async () => {
-    const objData = await getInfo("Passwords", id);
+    const objData = await getInfo("Pedidos", id);
     console.log(objData, "-");
 
+    if (objData.length === 0) return;
     setTimeout(() => {
-      axiosInsertData("Passwords", objData[0], id);
+      axiosInsertData("Pedidos", objData[0], id);
     }, 200);
   }, 500);
 
   res.status(200).send({ ok: true });
 };
 
-const updatePasswords = async (req, res) => {
+const updatePedido = async (req, res) => {
   const { id } = req.body;
   console.log(id);
   if (id === undefined) {
@@ -31,11 +32,12 @@ const updatePasswords = async (req, res) => {
     return;
   }
   setTimeout(async () => {
-    const objData = await getInfo("Passwords", id);
+    const objData = await getInfo("Pedidos", id);
     console.log(objData, "-");
 
+    if (objData.length === 0) return;
     setTimeout(() => {
-      axiosUpdateData("Passwords", id, objData[0]);
+      axiosUpdateData("Pedidos", id, objData[0]);
     }, 200);
   }, 500);
 
@@ -43,6 +45,6 @@ const updatePasswords = async (req, res) => {
 };
 
 module.exports = {
-  passwords,
-  updatePasswords,
+  pedido,
+  updatePedido,
 };

@@ -3,8 +3,9 @@ const {
   axiosInsertData,
   axiosUpdateData,
 } = require("../utils/axiosfn");
+const { eliminarPropiedadesVacias } = require("../utils/utils");
 
-const existenciasTiendas = async (req, res) => {
+const ventas = async (req, res) => {
   const { code, id } = req.body;
   console.log(code, id);
   if (id === undefined) {
@@ -12,19 +13,19 @@ const existenciasTiendas = async (req, res) => {
     return;
   }
   setTimeout(async () => {
-    const objData = await getInfo("ExistenciasTiendas", id);
-    console.log(objData, "-");
-
-    if (objData.length === 0) return;
+    const objData = await getInfo("Ventas", id);
+    //console.log(objData, "-");
+    const objTemp = eliminarPropiedadesVacias(objData[0]);
+    // console.log("objTemp", objTemp);
     setTimeout(() => {
-      axiosInsertData("ExistenciasTiendas", objData[0], id);
+      axiosInsertData("Ventas", objTemp, id);
     }, 200);
   }, 500);
 
   res.status(200).send({ ok: true });
 };
 
-const updateExistenciasTiendas = async (req, res) => {
+const updateVentas = async (req, res) => {
   const { id } = req.body;
   console.log(id);
   if (id === undefined) {
@@ -32,12 +33,11 @@ const updateExistenciasTiendas = async (req, res) => {
     return;
   }
   setTimeout(async () => {
-    const objData = await getInfo("ExistenciasTiendas", id);
-    console.log(objData, "-");
-
-    if (objData.length === 0) return;
+    const objData = await getInfo("Ventas", id);
+    // console.log(objData, "-");
+    const objTemp = eliminarPropiedadesVacias(objData[0]);
     setTimeout(() => {
-      axiosUpdateData("ExistenciasTiendas", id, objData[0]);
+      axiosUpdateData("Ventas", id, objTemp);
     }, 200);
   }, 500);
 
@@ -45,6 +45,6 @@ const updateExistenciasTiendas = async (req, res) => {
 };
 
 module.exports = {
-  existenciasTiendas,
-  updateExistenciasTiendas,
+  ventas,
+  updateVentas,
 };

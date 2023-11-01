@@ -10,8 +10,8 @@ const axiosInsertData = async (endPoint, obj, id) => {
     //se salva el log
   } catch (err) {
     //err.code  === 'ECONNREFUSED' no hay conexion con server
-    console.log(err);
-    console.log(err.response.data, "12");
+    console.log(13, err);
+    // console.log(err.response.data, "12");
 
     //se salva el log
     saveLog(endPoint, id, err.response.data.message, 0, 0);
@@ -28,10 +28,10 @@ const axiosUpdateData = async (endPoint, id, obj) => {
   try {
     const { data } = await SDK.updateData(endPoint, id, obj);
     //se salva el log
-    console.log(data, '--');
+    console.log(data, "--");
     saveLog(endPoint, id, data.message, 1, 0);
   } catch (err) {
-    console.log(err.response.data, '34');
+    console.log(err.response.data, "34");
     //se salva el log
     saveLog(endPoint, id, err.response.data.message, 0, 0);
   }

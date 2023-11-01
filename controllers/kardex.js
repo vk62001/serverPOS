@@ -15,6 +15,8 @@ const kardex = async (req, res) => {
     const objData = await getInfo("Kardex", id);
     console.log(objData, "-");
 
+    if(objData.length===0)
+      return;
     setTimeout(() => {
       axiosInsertData("Kardex", objData[0], id);
     }, 200);
@@ -34,6 +36,8 @@ const updateKardex = async (req, res) => {
     const objData = await getInfo("Kardex", id);
     console.log(objData, "-");
 
+    if(objData.length===0)
+      return;
     setTimeout(() => {
       axiosUpdateData("Kardex", id, objData[0]);
     }, 200);

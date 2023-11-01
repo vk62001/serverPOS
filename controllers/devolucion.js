@@ -4,7 +4,7 @@ const {
   axiosUpdateData,
 } = require("../utils/axiosfn");
 
-const usuarios = async (req, res) => {
+const devolucion = async (req, res) => {
   const { code, id } = req.body;
   console.log(code, id);
   if (id === undefined) {
@@ -12,18 +12,19 @@ const usuarios = async (req, res) => {
     return;
   }
   setTimeout(async () => {
-    const objData = await getInfo("Usuarios", id);
+    const objData = await getInfo("Devoluciones", id);
     console.log(objData, "-");
 
+    if (objData.length === 0) return;
     setTimeout(() => {
-      axiosInsertData("Usuarios", objData[0], id);
+      axiosInsertData("Devoluciones", objData[0], id);
     }, 200);
   }, 500);
 
   res.status(200).send({ ok: true });
 };
 
-const updateUsuarios = async (req, res) => {
+const updateDevolucion = async (req, res) => {
   const { id } = req.body;
   console.log(id);
   if (id === undefined) {
@@ -31,11 +32,12 @@ const updateUsuarios = async (req, res) => {
     return;
   }
   setTimeout(async () => {
-    const objData = await getInfo("Usuarios", id);
+    const objData = await getInfo("Devoluciones", id);
     console.log(objData, "-");
 
+    if (objData.length === 0) return;
     setTimeout(() => {
-      axiosUpdateData("Usuarios", id, objData[0]);
+      axiosUpdateData("Devoluciones", id, objData[0]);
     }, 200);
   }, 500);
 
@@ -43,6 +45,6 @@ const updateUsuarios = async (req, res) => {
 };
 
 module.exports = {
-  usuarios,
-  updateUsuarios,
+  devolucion,
+  updateDevolucion,
 };

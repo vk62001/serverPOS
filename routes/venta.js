@@ -1,4 +1,4 @@
-const { ventas, updateVentas } = require("../controllers/ventas");
+const { ventas, updateVentas } = require("../controllers/venta");
 
 const router = require("express").Router();
 
