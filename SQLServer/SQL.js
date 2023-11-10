@@ -55,75 +55,24 @@ const saveLog = async (spName, id, process, estatus, opc) => {
 
   console.log(result.rowsAffected, "Guardo");
   await pool.close();
-  // sql
-  //   .connect(config)
-  //   .then((pool) => {
-  //     // Stored procedure
-  //     return pool
-  //       .request()
-  //       .input("Proceso", spName)
-  //       .input("Id", id)
-  //       .input("Mensage", process)
-  //       .input("Estatus", estatus)
-  //       .input("Opc", opc)
-  //       .execute("sqsp_GuardaLogComunicacionIssp");
-  //   })
-  //   .then((result) => {
-  //     console.dir(result.rowsAffected, "Guardo");
-  //   })
-  //   .catch((err) => {
-  //     console.log(err, 45);
-  //   });
-  /* ########### */
-  // console.log("Llegue", 1000);
-  // delay(100);
-  // const poolConnection = await sql.connect(config);
-  // poolConnection.setMaxListeners(15);
-  // try {
-  //   if (!poolConnection._connected) return;
-  //   const data = await saveData(
-  //     poolConnection,
-  //     spName,
-  //     id,
-  //     process,
-  //     estatus,
-  //     opc
-  //   );
-  //   console.log(
-  //     data ? "true" : `${spName}, ${id}, ${process}, ${estatus}, ${opc}`
-  //   );
-  //   // console.log(poolConnection._connected);
-  // } catch (err) {
-  //   // poolConnection.close();
-  //   console.log(err, "error de conexión");
-  // }
-  // poolConnection.close();
+  
 };
 
-// const saveData = (connection, spName, id, process, status, opc) => {
-//   console.log(connection._connected, 48);
-
-//   if (!connection._connected) return;
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       delay(500);
-//       await connection
-//         .request()
-//         .input("Proceso", spName)
-//         .input("Id", id)
-//         .input("Mensage", process)
-//         .input("Estatus", status)
-//         .input("Opc", opc)
-//         .execute("sqsp_GuardaLogComunicacionIssp");
-//       resolve(true);
-//     } catch (error) {
-//       console.log(error, 64);
-//       reject(false);
-//     }
-//   });
-// };
+const getLog =  async () => {
+  const poolConnection = await sql.connect(config);
+  try {
+    var resultLog = await poolConnection
+      .request()
+      .query(`select id, Proceso_Origen, tienda_id, Proceso_Origen_Id, Mensage, estatus from SQT_LogComunicacion where estatus = 0 order by date_created asc`);
+    return resultLog;
+  } catch (err) {
+    console.error(err.message);
+  }
+  poolConnection.close();
+}
 
 module.exports = {
   getTable,
   saveLog,
+  getLog
 };

@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const { getTable } = require("./SQLServer/SQL");
+const { getTable, getLog } = require("./SQLServer/SQL");
 const apiRouter = require("./routes");
 const { io } = require("socket.io-client");
 const { SDKLocal } = require("./SDK/SDKLocal");
@@ -46,6 +46,9 @@ const useSocket = (idTienda) => {
   socket.on("connect", async () => {
     console.log("connected");
     //id de tienda
+    //revisar el log y el rollback
+    const getDataLog =  await getLog();
+    console.log(getDataLog)
   });
 
   socket.on("getCountRegistrosPOS", async (e) => {
