@@ -6,6 +6,7 @@ const apiRouter = require("./routes");
 const { io } = require("socket.io-client");
 const { SDKLocal } = require("./SDK/SDKLocal");
 const { getIdTienda } = require("./utils/axiosfn");
+const { delay } = require("./utils/utils");
 // App setup
 const PORT = 5001;
 const app = express();
@@ -26,30 +27,30 @@ app.use("/api/", apiRouter);
 
 app.get("/", async (req, res) => {
   const query = await getTable("sqt_configuracion");
-  console.log(query,'--');
+  // console.log(query,'--');
   res.status(200).send({ data: query });
 });
 
 const useSocket = (idTienda) => {
   const URi = process.env.URi_sockets;
-  console.log(URi);
+  // console.log(URi);
 
   const socket = io.connect(URi, {
     query: {
       tienda: idTienda,
-      room: "zona_norte",
+      room: "kernel",
     },
     transports: ["websocket"],
     upgrade: false,
   });
 
   socket.on("connect", async () => {
-    console.log("connected");
+    // console.log("connected");
     //id de tienda
   });
 
   socket.on("getCountRegistrosPOS", async (e) => {
-    console.log("pedimos tablas locales");
+    // console.log("pedimos tablas locales");
     const datosTablas = await SDKLocal.getTablas();
     socket.emit("setCountRegistros", { registros: datosTablas.data.data, e });
   });
@@ -59,11 +60,12 @@ const useSocket = (idTienda) => {
 
 const start = async () => {
   const idTienda = await getIdTienda();
-  if(!idTienda){
+  if (!idTienda) {
     //alerta si no hay conexión
     return;
   }
   useSocket(idTienda);
 };
 
+delay(90000);
 start();
