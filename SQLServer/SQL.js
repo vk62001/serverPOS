@@ -44,35 +44,38 @@ const saveLog = async (spName, id, process, estatus, opc) => {
 
   const pool = await new sql.ConnectionPool(config).connect();
   const request = pool.request();
+  try {
+    const result = await request
+      .input("Proceso", spName)
+      .input("Id", id)
+      .input("Mensage", process)
+      .input("Estatus", estatus)
+      .input("Opc", opc)
+      .execute("sqsp_GuardaLogComunicacionIssp");
 
-  const result = await request
-    .input("Proceso", spName)
-    .input("Id", id)
-    .input("Mensage", process)
-    .input("Estatus", estatus)
-    .input("Opc", opc)
-    .execute("sqsp_GuardaLogComunicacionIssp");
-
-  console.log(result.rowsAffected, "Guardo");
-  await pool.close();
-  
+    // console.log(result.rowsAffected, "Guardo");
+  } catch (err) {
+    console.table(err.originalError);
+  }
+  pool.close();
 };
 
-const getLog =  async () => {
-  const poolConnection = await sql.connect(config);
+const getLog = async () => {
+  const poolConnection = await new sql.ConnectionPool(config).connect();
+  const request = poolConnection.request();
   try {
-    var resultLog = await poolConnection
-      .request()
-      .query(`select id, Proceso_Origen, tienda_id, Proceso_Origen_Id, Mensage, estatus from SQT_LogComunicacion where estatus = 0 order by date_created asc`);
+    var resultLog = await request.query(
+      `select id, Proceso_Origen, tienda_id, Proceso_Origen_Id, Mensage, estatus, date_created from SQT_LogComunicacion where estatus = 0  order by date_created asc `
+    );
     return resultLog;
   } catch (err) {
     console.error(err.message);
   }
-  poolConnection.close();
-}
+  await poolConnection.close();
+};
 
 module.exports = {
   getTable,
   saveLog,
-  getLog
+  getLog,
 };

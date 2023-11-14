@@ -2,7 +2,8 @@ const APISQLocal = require("./instanceLocal");
 
 const SDKLocal = {
   getInfo: function (proceso, id) {
-    return APISQLocal.get(`api/v1/${proceso}/${id}`);
+    const url = id === "" ? `api/v1/${proceso}` : `api/v1/${proceso}/${id}`;
+    return APISQLocal.get(url);
   },
   getInfoTienda: function () {
     return APISQLocal.get("api/v1/Configuraciones");

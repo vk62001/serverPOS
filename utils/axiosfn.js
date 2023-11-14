@@ -1,6 +1,7 @@
 const { SDK } = require("../SDK/SDK");
 const { SDKLocal } = require("../SDK/SDKLocal");
 const { saveLog } = require("../SQLServer/SQL");
+const { eliminarPropiedadesVacias } = require("./utils");
 
 const axiosInsertData = async (endPoint, obj, id) => {
   try {
@@ -55,166 +56,120 @@ const getIdTienda = async () => {
     return false;
   }
 };
-/*
-const axiosUpdateApertura = async (id, obj) => {
-  try {
-    const { data } = await SDK.updateApertura(id, obj);
-    //se salva el log
-    console.log(data);
-    saveLog("AperturasTiendas", id, data.message, 1, 0);
-  } catch (err) {
-    console.log(err.response.data);
-    //se salva el log
-    saveLog("AperturasTiendas", id, data.message, 0, 0);
-  }
-};
 
-const axiosInsertApertura = async (obj, id) => {
-  try {
-    const { data } = await SDK.apertura(obj);
-    console.log(data.message, "21", id);
-    saveLog("AperturasTiendas", id, data.message, 1, 0);
-    //se salva el log
-  } catch (err) {
-    console.log(err.response.data);
-    //se salva el log
-    saveLog("AperturasTiendas", id, data.message, 0, 0);
-  }
-};
+/**
+ * Post request Log to Central
+ * @params array
+ * @returns {Promise<*>}
+ *
+ */
+const mappingErrors = async (data) => {
+  const numberArray = data.length;
+  let numberSuccess = 0;
 
-const axiosUpdateDepositos = async (id, obj) => {
-  try {
-    const { data } = await SDK.updateDeposito(id, obj);
-    console.log(data.message, "21");
-    saveLog("Depositos", id, data.message, 1, 0);
-    //se salva el log
-  } catch (err) {
-    console.log(err.response);
-    console.log("Error updating" + err.response.status + " .");
-    if (err.response.status != 405) {
-      //se salva el log
-      saveLog("Depositos", id, data.message, 0, 0);
+  const processElement = async (element) => {
+    // console.log(element);
+    try {
+      const claveregistro =
+        element.Proceso_Origen === "CountRegistros"
+          ? ""
+          : element.Proceso_Origen_Id;
+      // console.log("id", claveregistro, 77);
+
+      const responseLocal = await SDKLocal.getInfo(
+        element.Proceso_Origen,
+        claveregistro
+      );
+      // console.log(responseLocal.data, 83);
+      const dataSend =
+        element.Proceso_Origen === "CountRegistros"
+          ? responseLocal.data.data
+          : eliminarPropiedadesVacias(responseLocal.data.datas[0]);
+      const responseCentral = await SDK.insertData(
+        element.Proceso_Origen,
+        dataSend
+      );
+      // console.log(responseCentral.data, "try");
+      if (responseCentral.data.succeeded) {
+        // console.log("entra guarda log");
+        await saveLog(
+          element.Proceso_Origen,
+          element.id,
+          "Reproceso correcto",
+          1,
+          1
+        );
+        numberSuccess++;
+      } 
+    } catch (err) {
+      console.log(err.response.data, "error 35", 35);
+      await saveLog(
+        element.Proceso_Origen,
+        element.id,
+        err.response.data.message,
+        0,
+        1
+      );
     }
-  }
-};
+  };
 
-const axiosIsertDepositos = async (obj, id) => {
-  try {
-    const { data } = await SDK.deposito(obj);
-    console.log(data.message, "21");
-    saveLog("Depositos", id, data.message, 1, 0);
-    //se salva el log
-  } catch (err) {
-    console.log(err.response.data);
-    //se salva el log
-    saveLog("Depositos", id, data.message, 0, 0);
+  for (const element of data) {
+    await processElement(element); // Espera a que se complete la operación antes de continuar con el siguiente elemento
   }
-};
 
-const axiosInsertHistorialCajero = async (obj, id) => {
-  try {
-    console.log(obj, "-", id, "historial");
-    const { data } = await SDK.historialCajero(obj);
-    console.log(data.message, "21");
-    saveLog("HistorialesCajeros", id, data.message, 1, 0);
-  } catch (err) {
-    console.log(err.response.data);
-    saveLog("HistorialesCajeros", id, data.message, 0, 0);
-  }
-};
+  return numberArray - numberSuccess;
 
-const axiosUpdateHistorialCajero = async (id, obj) => {
-  try {
-    const { data } = await SDK.updatehistorialCajero(id, obj);
-    console.log(data.message, "21");
-    saveLog("HistorialesCajeros", id, data.message, 1, 0);
-  } catch (err) {
-    console.log(err.response);
-    console.log("Error updating" + err.response.status + " .");
-    if (err.response.status != 405) {
-      saveLog("HistorialesCajeros", id, data.message, 0, 0);
+  /*const numberArray = data.length;
+  let numberSuccess = 0;
+
+  await // Promise.all(
+  data.map(async (element, index) => {
+    // console.log("antes", index);
+    await delay(3000);
+    // console.table(element);
+    try {
+      const responseLocal = await SDKLocal.getInfo(
+        element.Proceso_Origen,
+        element.Proceso_Origen_Id
+      );
+      // console.log(responseLocal.data, "datos locales");
+      const data = eliminarPropiedadesVacias(responseLocal.data.datas[0]);
+      // console.log(data, "dato que enviare");
+      const responseCentral = await SDK.insertData(
+        element.Proceso_Origen,
+        data
+      );
+      // console.log(responseCentral.data, "try");
+      if (responseCentral.data.succeeded) {
+        // console.log("entra guarda log");
+        saveLog(element.Proceso_Origen, element.id, "Reproceso correcto", 1, 1);
+        numberSuccess++;
+      }
+      //Guardar a central e interpretar response de central
+      //si es favorable actualizar el estatus del registro en el log local e incrementar el numberSuccess
+      //Si no es favorable no se suma
+    } catch (err) {
+      console.debug(err, "error 147", 147);
+
+      console.debug(err?.response?.data, 149, element);
+      saveLog(
+        element.Proceso_Origen,
+        element.id,
+        err?.response?.data?.message,
+        0,
+        1
+      );
     }
-  }
+  });
+  // );
+  return numberArray - numberSuccess;
+  */
 };
 
-const axiosInsertRetiroCaja = async (obj, id) => {
-  try {
-    console.log(obj, "-", id, "retiroCaja");
-    const { data } = await SDK.retiroCaja(obj);
-    console.log(data.message, "21");
-    saveLog("RetirosCaja", id, data.message, 1, 0);
-  } catch (err) {
-    console.log(err.response.data);
-    saveLog("RetirosCaja", id, data.message, 0, 0);
-  }
-};
-
-const axiosUpdateRetiroCaja = async (id, obj) => {
-  try {
-    const { data } = await SDK.updateReiroCaja(id, obj);
-    console.log(data.message, "21");
-    saveLog("RetirosCaja", id, data.message, 1, 0);
-  } catch (err) {
-    console.log(err.response);
-    console.log("Error updating" + err.response.status + " .");
-    if (err.response.status != 405) {
-      saveLog("RetirosCaja", id, data.message, 0, 0);
-    }
-  }
-};
-
-const axiosInsertRemesas = async (obj, id) => {
-  try {
-    console.log(obj, "-", id);
-    const { data } = await SDK.remesas(obj);
-    console.log(data.message, "21");
-    saveLog("Remesas", id, data.message, 1, 0);
-  } catch (err) {
-    console.log(err.response.data);
-    saveLog("Remesas", id, data.message, 0, 0);
-  }
-};
-
-const axiosUpdateRemesas = async (id, obj) => {
-  try {
-    const { data } = await SDK.updateRemesas(id, obj);
-    console.log(data.message, "21");
-    saveLog("Remesas", id, data.message, 1, 0);
-  } catch (err) {
-    console.log(err.response);
-    console.log("Error updating", err.response.status, " .");
-    if (err.response.status != 405) {
-      saveLog("Remesas", id, data.message, 0, 0);
-    }
-  }
-};
-
-const axiosInsertTicketsRemesas = async (obj, id) => {
-  try {
-    console.log(obj, "-", id, "ITicketsRemesas");
-    const { data } = await SDK.insertData("TicketsRemesas", obj);
-    console.log(data.message, "21");
-    saveLog("TicketsRemesas", id, data.message, 1, 0);
-  } catch (err) {
-    console.log(err.response.data);
-    saveLog("TicketsRemesas", id, data.message, 0, 0);
-  }
-};
-
-const axiosUpdateTicketsRemesas = async (id, obj) => {
-  try {
-    const { data } = await SDK.updateData("TicketsRemesas", id, obj);
-    console.log(data.message, "21");
-    saveLog("TicketsRemesas", id, data.message, 1, 0);
-  } catch (err) {
-    console.log(err.response);
-    saveLog("TicketsRemesas", id, data.message, 0, 0);
-  }
-};
-*/
 module.exports = {
   getInfo,
   getIdTienda,
   axiosInsertData,
   axiosUpdateData,
+  mappingErrors,
 };

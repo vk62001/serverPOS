@@ -5,7 +5,7 @@ const { getTable, getLog } = require("./SQLServer/SQL");
 const apiRouter = require("./routes");
 const { io } = require("socket.io-client");
 const { SDKLocal } = require("./SDK/SDKLocal");
-const { getIdTienda } = require("./utils/axiosfn");
+const { getIdTienda, mappingErrors } = require("./utils/axiosfn");
 const { delay } = require("./utils/utils");
 // App setup
 const PORT = 5001;
@@ -48,8 +48,14 @@ const useSocket = (idTienda) => {
     // console.log("connected");
     //id de tienda
     //revisar el log y el rollback
-    const getDataLog =  await getLog();
-    console.log(getDataLog)
+    let result = 0;
+    do {
+      const getDataLog = await getLog();
+      result = await mappingErrors(getDataLog.recordset);
+      // console.table(getDataLog.recordset);
+      console.log(result, "logs no procesado");
+    } while (result > 0);
+    console.table({ Resultado: "Todo procesado" });
   });
 
   socket.on("getCountRegistrosPOS", async (e) => {
@@ -64,7 +70,7 @@ const useSocket = (idTienda) => {
 const start = async () => {
   const idTienda = await getIdTienda();
   if (!idTienda) {
-    //alerta si no hay conexión
+    //alerta si no hay conexiónva
     return;
   }
   useSocket(idTienda);
