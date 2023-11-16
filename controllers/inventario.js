@@ -5,16 +5,16 @@ const {
 } = require("../utils/axiosfn");
 
 const inventario = async (req, res) => {
-  console.log("post");
+  // console.log("post");
   const { code, id } = req.body;
-  console.log(code, id);
+  // console.log(code, id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
     return;
   }
   setTimeout(async () => {
     const objData = await getInfo("Inventarios", id);
-    console.log(objData, objData.length, "-", 18);
+    // console.log(objData, objData.length, "-", 18);
 
     if (objData.length === 0) return;
     setTimeout(() => {
@@ -26,9 +26,9 @@ const inventario = async (req, res) => {
 };
 
 const updateInventario = async (req, res) => {
-  console.log("put");
+  // console.log("put");
   const { id } = req.body;
-  console.log(id);
+  // console.log(id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
     return;
@@ -36,7 +36,7 @@ const updateInventario = async (req, res) => {
   setTimeout(async () => {
     const objData = await getInfo("Inventarios", id);
 
-    console.log(objData, "- 37");
+    // console.log(objData, "- 37");
     if (objData.length === 0) return;
     setTimeout(() => {
       axiosUpdateData("Inventarios", id, objData[0]);

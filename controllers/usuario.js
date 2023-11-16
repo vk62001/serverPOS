@@ -6,14 +6,14 @@ const {
 
 const usuario = async (req, res) => {
   const { code, id } = req.body;
-  console.log(code, id);
+  // console.log(code, id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
     return;
   }
   setTimeout(async () => {
     const objData = await getInfo("Usuarios", id);
-    console.log(objData, "-");
+    // console.log(objData, "-");
 
     setTimeout(() => {
       axiosInsertData("Usuarios", objData[0], id);
@@ -25,14 +25,14 @@ const usuario = async (req, res) => {
 
 const updateUsuario = async (req, res) => {
   const { id } = req.body;
-  console.log(id);
+  // console.log(id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
     return;
   }
   setTimeout(async () => {
     const objData = await getInfo("Usuarios", id);
-    console.log(objData, "-");
+    // console.log(objData, "-");
 
     setTimeout(() => {
       axiosUpdateData("Usuarios", id, objData[0]);

@@ -6,14 +6,14 @@ const {
 
 const pedido = async (req, res) => {
   const { code, id } = req.body;
-  console.log(code, id);
+  // console.log(code, id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
     return;
   }
   setTimeout(async () => {
     const objData = await getInfo("Pedidos", id);
-    console.log(objData, "-");
+    // console.log(objData, "-");
 
     if (objData.length === 0) return;
     setTimeout(() => {
@@ -26,14 +26,14 @@ const pedido = async (req, res) => {
 
 const updatePedido = async (req, res) => {
   const { id } = req.body;
-  console.log(id);
+  // console.log(id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
     return;
   }
   setTimeout(async () => {
     const objData = await getInfo("Pedidos", id);
-    console.log(objData, "-");
+    // console.log(objData, "-");
 
     if (objData.length === 0) return;
     setTimeout(() => {

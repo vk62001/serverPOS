@@ -6,7 +6,7 @@ const {
 
 const historialCajero = async (req, res) => {
   const { code, id } = req.body;
-  console.log(code, id);
+  // console.log(code, id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
     return;
@@ -14,7 +14,7 @@ const historialCajero = async (req, res) => {
 
   setTimeout(async () => {
     const objData = await getInfo("HistorialesCajeros", id);
-    console.log(objData, "-");
+    // console.log(objData, "-");
 
     if(objData.length===0)
       return;
@@ -27,15 +27,15 @@ const historialCajero = async (req, res) => {
 
 const updateHistorialCajero = async (req, res) => {
   const { id } = req.body;
-  console.log(req.body, "- body");
-  console.log(id);
+  // console.log(req.body, "- body");
+  // console.log(id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
     return;
   }
   setTimeout(async () => {
     const objData = await getInfo("HistorialesCajeros", id);
-    console.log(objData, "-");
+    // console.log(objData, "-");
 
     if(objData.length===0)
       return;

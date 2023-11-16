@@ -7,7 +7,7 @@ const { eliminarPropiedadesVacias } = require("../utils/utils");
 
 const ventas = async (req, res) => {
   const { code, id } = req.body;
-  console.log(code, id);
+  // console.log(code, id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
     return;
@@ -27,7 +27,7 @@ const ventas = async (req, res) => {
 
 const updateVentas = async (req, res) => {
   const { id } = req.body;
-  console.log(id);
+  // console.log(id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
     return;

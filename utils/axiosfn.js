@@ -3,10 +3,13 @@ const { SDKLocal } = require("../SDK/SDKLocal");
 const { saveLog } = require("../SQLServer/SQL");
 const { eliminarPropiedadesVacias } = require("./utils");
 
+const crypto = require("crypto");
+
 const axiosInsertData = async (endPoint, obj, id) => {
   try {
     const { data } = await SDK.insertData(endPoint, obj);
-    console.log(data.message, "21", id);
+    // console.log(data.message, "21", id);
+
     saveLog(endPoint, id, data.message, 1, 0);
     //se salva el log
   } catch (err) {
@@ -29,7 +32,7 @@ const axiosUpdateData = async (endPoint, id, obj) => {
   try {
     const { data } = await SDK.updateData(endPoint, id, obj);
     //se salva el log
-    console.log(data, "--");
+    // console.log(data, "--", obj);
     saveLog(endPoint, id, data.message, 1, 0);
   } catch (err) {
     console.log(err.response.data, "34");
@@ -85,6 +88,7 @@ const mappingErrors = async (data) => {
         element.Proceso_Origen === "CountRegistros"
           ? responseLocal.data.data
           : eliminarPropiedadesVacias(responseLocal.data.datas[0]);
+
       const responseCentral = await SDK.insertData(
         element.Proceso_Origen,
         dataSend
@@ -102,14 +106,9 @@ const mappingErrors = async (data) => {
         numberSuccess++;
       } 
     } catch (err) {
-      console.log(err.response.data, "error 35", 35);
-      await saveLog(
-        element.Proceso_Origen,
-        element.id,
-        err.response.data.message,
-        0,
-        1
-      );
+      console.log(err.message, "error 35", 35);
+      // // console.log(err.response.data, "error 35", 35);
+      await saveLog("Node", err.message, 1, 0);
     }
   };
 
@@ -118,52 +117,6 @@ const mappingErrors = async (data) => {
   }
 
   return numberArray - numberSuccess;
-
-  /*const numberArray = data.length;
-  let numberSuccess = 0;
-
-  await // Promise.all(
-  data.map(async (element, index) => {
-    // console.log("antes", index);
-    await delay(3000);
-    // console.table(element);
-    try {
-      const responseLocal = await SDKLocal.getInfo(
-        element.Proceso_Origen,
-        element.Proceso_Origen_Id
-      );
-      // console.log(responseLocal.data, "datos locales");
-      const data = eliminarPropiedadesVacias(responseLocal.data.datas[0]);
-      // console.log(data, "dato que enviare");
-      const responseCentral = await SDK.insertData(
-        element.Proceso_Origen,
-        data
-      );
-      // console.log(responseCentral.data, "try");
-      if (responseCentral.data.succeeded) {
-        // console.log("entra guarda log");
-        saveLog(element.Proceso_Origen, element.id, "Reproceso correcto", 1, 1);
-        numberSuccess++;
-      }
-      //Guardar a central e interpretar response de central
-      //si es favorable actualizar el estatus del registro en el log local e incrementar el numberSuccess
-      //Si no es favorable no se suma
-    } catch (err) {
-      console.debug(err, "error 147", 147);
-
-      console.debug(err?.response?.data, 149, element);
-      saveLog(
-        element.Proceso_Origen,
-        element.id,
-        err?.response?.data?.message,
-        0,
-        1
-      );
-    }
-  });
-  // );
-  return numberArray - numberSuccess;
-  */
 };
 
 module.exports = {
