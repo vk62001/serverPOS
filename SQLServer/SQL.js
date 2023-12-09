@@ -55,7 +55,8 @@ const saveLog = async (spName, id, process, estatus, opc) => {
 
     // console.log(result.rowsAffected, "Guardo");
   } catch (err) {
-    console.table(err.originalError);
+    // console.table(err.originalError);
+    console.table(err);
   }
   pool.close();
 };

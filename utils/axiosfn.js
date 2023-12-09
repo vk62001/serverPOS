@@ -18,7 +18,7 @@ const axiosInsertData = async (endPoint, obj, id) => {
     // console.log(err.response.data, "12");
 
     //se salva el log
-    saveLog(endPoint, id, err.response.data.message, 0, 0);
+    saveLog(endPoint, id, "Error insert", 0, 0);
 
     // console.log(err.response);
     // console.log("Error updating" + err.response.status + " .");
@@ -35,9 +35,9 @@ const axiosUpdateData = async (endPoint, id, obj) => {
     // console.log(data, "--", obj);
     saveLog(endPoint, id, data.message, 1, 0);
   } catch (err) {
-    console.log(err.response.data, "34");
+    console.log(err, "34");
     //se salva el log
-    saveLog(endPoint, id, err.response.data.message, 0, 0);
+    saveLog(endPoint, id, "Error update", 0, 0);
   }
 };
 
@@ -88,9 +88,10 @@ const mappingErrors = async (data) => {
         element.Proceso_Origen === "CountRegistros"
           ? responseLocal.data.data
           : eliminarPropiedadesVacias(responseLocal.data.datas[0]);
-
-      const responseCentral = await SDK.insertData(
+      console.log(dataSend, 91);
+      const responseCentral = await SDK.updateData(
         element.Proceso_Origen,
+        element.Proceso_Origen_Id,
         dataSend
       );
       // console.log(responseCentral.data, "try");
@@ -104,11 +105,12 @@ const mappingErrors = async (data) => {
           1
         );
         numberSuccess++;
-      } 
+      }
     } catch (err) {
-      console.log(err.message, "error 35", 35);
+      // console.log(err, "error 35", 35);
+      console.log(err, "error 35", 35);
       // // console.log(err.response.data, "error 35", 35);
-      await saveLog("Node", err.message, 1, 0);
+      await saveLog("Node", "0", err.message, 1, 0);
     }
   };
 
