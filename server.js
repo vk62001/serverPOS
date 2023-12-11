@@ -58,6 +58,19 @@ const useSocket = (idTienda) => {
     console.table({ Resultado: "Todo procesado" });
   });
 
+
+  socket.on("reconnection_attempt", async () => {
+    let result = 0;
+    do {
+      const getDataLog = await getLog();
+      result = await mappingErrors(getDataLog.recordset);
+      // console.table(getDataLog.recordset);
+      console.log(result, "logs no procesado");
+    } while (result > 0);
+    console.table({ Resultado: "Todo procesado" });
+  });
+
+
   socket.on("getCountRegistrosPOS", async (e) => {
     // console.log("pedimos tablas locales");
     const datosTablas = await SDKLocal.getTablas();
