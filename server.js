@@ -7,6 +7,7 @@ const { io } = require("socket.io-client");
 const { SDKLocal } = require("./SDK/SDKLocal");
 const { getIdTienda, mappingErrors } = require("./utils/axiosfn");
 const { delay } = require("./utils/utils");
+
 // App setup
 const PORT = 5001;
 const app = express();
@@ -78,14 +79,29 @@ const useSocket = (idTienda) => {
   socket.emit("test");
 };
 
-const start = async () => {
-  setTimeout(async () => {
-    const idTienda = await getIdTienda();
-    if (!idTienda) {
-      //alerta si no hay conexiónva
-      return;
+
+
+const iteracion = async (max=100, intervalo = 10000 ) =>{
+  for(let i = 0; i < max; i++){
+    try {
+      const idTienda = await getIdTienda();
+      return idTienda;
+    } catch (error) {
+      i;
+      console.log("error, iteración no: ", i)
+      await delay(intervalo);
     }
-    useSocket(idTienda);
-  }, 60000);
+  }
+  throw new Error('No sirve esta chingadera');
+}
+
+
+const start = async () => {
+  iteracion()
+  .then(res=>{
+    console.log(res);
+    useSocket(res);
+  })
+  .catch(err=>console.log('no sirve esta mamada'))
 };
 start();
