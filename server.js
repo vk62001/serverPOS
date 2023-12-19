@@ -49,27 +49,25 @@ const useSocket = (idTienda) => {
     //id de tienda
     //revisar el log y el rollback
     let result = 0;
-    do {
-      const getDataLog = await getLog();
-      result = await mappingErrors(getDataLog.recordset);
-      // console.table(getDataLog.recordset);
-      console.log(result, "logs no procesado");
-    } while (result > 0);
+    // do {
+    const getDataLog = await getLog();
+    result = await mappingErrors(getDataLog.recordset);
+    // console.table(getDataLog.recordset);
+    console.log(result, "logs no procesado");
+    // } while (result > 0);
     console.table({ Resultado: "Todo procesado" });
   });
-
 
   socket.on("reconnection_attempt", async () => {
     let result = 0;
-    do {
-      const getDataLog = await getLog();
-      result = await mappingErrors(getDataLog.recordset);
-      // console.table(getDataLog.recordset);
-      console.log(result, "logs no procesado");
-    } while (result > 0);
+    // do {
+    const getDataLog = await getLog();
+    result = await mappingErrors(getDataLog.recordset);
+    // console.table(getDataLog.recordset);
+    console.log(result, "logs no procesado");
+    // } while (result > 0);
     console.table({ Resultado: "Todo procesado" });
   });
-
 
   socket.on("getCountRegistrosPOS", async (e) => {
     // console.log("pedimos tablas locales");
@@ -81,13 +79,13 @@ const useSocket = (idTienda) => {
 };
 
 const start = async () => {
-  const idTienda = await getIdTienda();
-  if (!idTienda) {
-    //alerta si no hay conexiónva
-    return;
-  }
-  useSocket(idTienda);
+  setTimeout(async () => {
+    const idTienda = await getIdTienda();
+    if (!idTienda) {
+      //alerta si no hay conexiónva
+      return;
+    }
+    useSocket(idTienda);
+  }, 60000);
 };
-
-delay(90000);
 start();
