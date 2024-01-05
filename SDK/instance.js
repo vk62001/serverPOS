@@ -2,7 +2,7 @@ const axios = require("axios");
 
 const URI = process.env.URi_central;
 
-console.log(URI);
+console.log(URI, "Uri CENTRAL", Date());
 
 const APISQ = axios.create({
   baseURL: URI,

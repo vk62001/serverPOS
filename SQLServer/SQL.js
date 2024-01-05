@@ -70,7 +70,7 @@ const getLog = async () => {
     );
     return resultLog;
   } catch (err) {
-    console.error(err.message);
+    console.error(err.message, Date());
   }
   await poolConnection.close();
 };

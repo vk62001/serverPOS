@@ -7,6 +7,7 @@ const { io } = require("socket.io-client");
 const { SDKLocal } = require("./SDK/SDKLocal");
 const { getIdTienda, mappingErrors } = require("./utils/axiosfn");
 const { delay } = require("./utils/utils");
+const axios = require("axios");
 
 // App setup
 const PORT = 5001;
@@ -46,7 +47,7 @@ const useSocket = (idTienda) => {
   });
 
   socket.on("connect", async () => {
-    // console.log("connected");
+    console.log("connected", Date());
     //id de tienda
     //revisar el log y el rollback
     let result = 0;
@@ -54,7 +55,9 @@ const useSocket = (idTienda) => {
     const getDataLog = await getLog();
     result = await mappingErrors(getDataLog.recordset);
     // console.table(getDataLog.recordset);
-    console.log(result, "logs no procesado");
+    console.log(
+      `${result} de ${getDataLog.recordset.length} logs no procesado`
+    );
     // } while (result > 0);
     console.table({ Resultado: "Todo procesado" });
   });
@@ -75,33 +78,59 @@ const useSocket = (idTienda) => {
     const datosTablas = await SDKLocal.getTablas();
     socket.emit("setCountRegistros", { registros: datosTablas.data.data, e });
   });
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
 
   socket.emit("test");
 };
 
-
-
-const iteracion = async (max=100, intervalo = 10000 ) =>{
-  for(let i = 0; i < max; i++){
+const iteracion = async (max = 2, intervalo = 10000) => {
+  const url = `${process.env.URi_local}api/v1/Configuraciones`;
+  console.log(url, "85 -- Iterando ", Date());
+  for (let i = 0; i < max; i++) {
     try {
-      const idTienda = await getIdTienda();
-      return idTienda;
+      const { data } = await axios.get(url, {
+        headers: {
+          Authorization: `Basic ${process.env.credentials}`,
+          "Content-Type": "application/json",
+        },
+      });
+      // console.log(data.datas[0].valor, 94);
+      return data.datas[0].valor;
     } catch (error) {
       i;
-      console.log("error, iteración no: ", i)
+      //console.log("error, iteración no: ", i, error, Date());
+      if (error.response) {
+        if (error.response.data.message) {
+        } else {
+          // El servidor respondió con un código de estado fuera del rango 2xx
+          console.error(
+            "Respuesta de error del servidor:",
+            error.response.status,
+            error.response.statusText
+          );
+        }
+      } else if (error.request) {
+        // La solicitud fue hecha pero no se recibió respuesta
+        console.error("No se recibió respuesta del servidor:", error.message);
+      } else {
+        // Error desconocido
+        console.error("Error desconocido:", error.message);
+      }
+
       await delay(intervalo);
     }
   }
-  throw new Error('No sirve esta chingadera');
-}
-
+  throw new Error("No sirve esta chingadera");
+};
 
 const start = async () => {
   iteracion()
-  .then(res=>{
-    console.log(res);
-    useSocket(res);
-  })
-  .catch(err=>console.log('no sirve esta mamada'))
+    .then((res) => {
+      console.log(res, "Socket Conectado ", Date());
+      useSocket(res);
+    })
+    .catch((err) => console.log("no sirve esta mamada", Date()));
 };
 start();
