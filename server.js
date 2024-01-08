@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const { getTable, getLog } = require("./SQLServer/SQL");
+const { getTable, getLog, getInfo } = require("./SQLServer/SQL");
 const apiRouter = require("./routes");
 const { io } = require("socket.io-client");
 const { SDKLocal } = require("./SDK/SDKLocal");
@@ -9,6 +9,7 @@ const { getIdTienda, mappingErrors } = require("./utils/axiosfn");
 const { delay } = require("./utils/utils");
 const axios = require("axios");
 
+let socket;
 // App setup
 const PORT = 5001;
 const app = express();
@@ -27,6 +28,22 @@ app.use(express.static("public"));
 
 app.use("/api/", apiRouter);
 
+const emitCountRegistrosEvent = async (e) => {
+  console.log("contando info", socket.id);
+  // const { data } = await SDKLocal.getTablas();
+
+  const data = await getInfo(tiendaId);
+  socket.emit("setCountRegistros", {
+    registros: data,
+    socketId: socket.id,
+  });
+};
+
+app.get("/CountInfo",  (req, res) => {
+  emitCountRegistrosEvent();
+  res.status(200).send({ ok: true });
+});
+
 app.get("/", async (req, res) => {
   const query = await getTable("sqt_configuracion");
   // console.log(query,'--');
@@ -37,7 +54,7 @@ const useSocket = (idTienda) => {
   const URi = process.env.URi_sockets;
   // console.log(URi);
 
-  const socket = io.connect(URi, {
+  socket = io.connect(URi, {
     query: {
       tienda: idTienda,
       room: "kernel",
@@ -74,9 +91,9 @@ const useSocket = (idTienda) => {
   });
 
   socket.on("getCountRegistrosPOS", async (e) => {
-    // console.log("pedimos tablas locales");
-    const datosTablas = await SDKLocal.getTablas();
-    socket.emit("setCountRegistros", { registros: datosTablas.data.data, e });
+    console.log("pedimos tablas locales", e);
+    // const datosTablas = await SDKLocal.getTablas();
+    // socket.emit("setCountRegistros", { registros: datosTablas.data.data, e });
   });
   socket.on("disconnect", () => {
     console.log("user disconnected");
@@ -129,6 +146,7 @@ const start = async () => {
   iteracion()
     .then((res) => {
       console.log(res, "Socket Conectado ", Date());
+      tiendaId = res;
       useSocket(res);
     })
     .catch((err) => console.log("no sirve esta mamada", Date()));

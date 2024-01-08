@@ -18,30 +18,7 @@ const getTable = async (table) => {
   poolConnection.close();
 };
 
-// const pool = new sql.ConnectionPool(config);
-// pool
-//   .connect()
-//   .then(() => {
-//     console.log("Conexión a SQL Server establecida");
-//   })
-//   .catch((err) => {
-//     console.log("Error al conectar a SQL Server:", err);
-//   });
-
-// // Para cerrar la conexión cuando tu aplicación se detenga
-// process.on("SIGINT", () => {
-//   pool.close().then(() => {
-//     console.log("Conexión a SQL Server cerrada");
-//     process.exit(0);
-//   });
-// });
-
 const saveLog = async (spName, id, process, estatus, opc) => {
-  // sql.on("error", (err) => {
-  //   // ... error handler
-  //   console.log(err, 23);
-  // });
-
   const pool = await new sql.ConnectionPool(config).connect();
   const request = pool.request();
   try {
@@ -52,10 +29,7 @@ const saveLog = async (spName, id, process, estatus, opc) => {
       .input("Estatus", estatus)
       .input("Opc", opc)
       .execute("sqsp_GuardaLogComunicacionIssp");
-
-    // console.log(result.rowsAffected, "Guardo");
   } catch (err) {
-    // console.table(err.originalError);
     console.table(err);
   }
   pool.close();
@@ -75,8 +49,58 @@ const getLog = async () => {
   await poolConnection.close();
 };
 
+const getInfo = async (tiendaId) => {
+  // const poolConnection = await sql.connect(config);
+  // try {
+  //   const { recordset } = await poolConnection
+  //     .request()
+  //     .input("IdTienda", 334)
+  //     .input("Opc", 0)
+  //     .execute("SQSP_ConteoComunicacion");
+  //   //  console.log(recordset, 59);
+
+  //   return recordset;
+  // } catch (err) {
+  //   console.error(err.message);
+  // }
+  // poolConnection.close();
+
+  const pool = await sql.connect(config);
+
+  try {
+    const data = await pool
+      .request()
+      .input("id", tiendaId)
+      .input("Source", "")
+      .input("AperturasTiendas", 0)
+      .input("HistorialesCajeros", 0)
+      .input("Ventas", 0)
+      .input("DevolucionesVentas", 0)
+      .input("TicketsRemesas", 0)
+      .input("Remesas", 0)
+      .input("Pedidos", 0)
+      .input("PedidosProveedor", 0)
+      .input("Devoluciones", 0)
+      .input("Depositos", 0)
+      .input("RetirosCaja", 0)
+      .input("FacturasAjustesInventarios", 0)
+      .input("Ajustes", 0)
+      .input("Inventarios", 0)
+      .input("Cupones", 0)
+      .input("Kardex", 0)
+      .input("opcion", 3)
+      .input("Result", 0)
+      .execute("SQCOM_CountRegistros");
+    console.log(data.recordsets);
+    return data;
+  } catch (err) {
+    console.log(err);
+  }
+  pool.close();
+};
 module.exports = {
   getTable,
   saveLog,
   getLog,
+  getInfo,
 };
