@@ -5,7 +5,7 @@ const { getTable, getLog, getInfo } = require("./SQLServer/SQL");
 const apiRouter = require("./routes");
 const { io } = require("socket.io-client");
 const { SDKLocal } = require("./SDK/SDKLocal");
-const { getIdTienda, mappingErrors } = require("./utils/axiosfn");
+const { mappingErrors } = require("./utils/axiosfn");
 const { delay } = require("./utils/utils");
 const axios = require("axios");
 
@@ -27,22 +27,6 @@ app.use(express.static("public"));
 //rutas
 
 app.use("/api/", apiRouter);
-
-const emitCountRegistrosEvent = async (e) => {
-  console.log("contando info", socket.id);
-  // const { data } = await SDKLocal.getTablas();
-
-  const data = await getInfo(tiendaId);
-  socket.emit("setCountRegistros", {
-    registros: data,
-    socketId: socket.id,
-  });
-};
-
-app.get("/CountInfo",  (req, res) => {
-  emitCountRegistrosEvent();
-  res.status(200).send({ ok: true });
-});
 
 app.get("/", async (req, res) => {
   const query = await getTable("sqt_configuracion");
@@ -91,10 +75,27 @@ const useSocket = (idTienda) => {
   });
 
   socket.on("getCountRegistrosPOS", async (e) => {
-    console.log("pedimos tablas locales", e);
-    // const datosTablas = await SDKLocal.getTablas();
-    // socket.emit("setCountRegistros", { registros: datosTablas.data.data, e });
+    try {
+      // console.log("pedimos tablas locales");
+      const { data } = await SDKLocal.getInfo("CountRegistros", tiendaId);
+      // console.log(data);
+      socket.emit("setCountRegistros", { registros: data.data, e }); //Se envia la informacion a central
+    } catch (err) {
+      console.log(err);
+      socket.emit("setCountRegistros", { registros: [], e }); //Se envia la informacion a central
+    }
   });
+
+  socket.on("getExistenciasPOS", async (e) => {
+    try {
+      const { data } = await SDKLocal.getInfo("ExistenciasTiendas/ByTienda",e.tiendaId);      
+      socket.emit("setExistencias", { registros: data.datas, e }); //Se envia la informacion a central
+    } catch (err) {
+      console.log(err);
+      socket.emit("setExistencias", { registros: [], e }); //Se envia la informacion a central
+    }
+  });
+  
   socket.on("disconnect", () => {
     console.log("user disconnected");
   });
