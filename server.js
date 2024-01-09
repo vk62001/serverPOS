@@ -92,10 +92,10 @@ const useSocket = (idTienda) => {
         "ExistenciasTiendas/ByTienda",
         e.tiendaId
       );
-      socket.emit("setExistencias", { registros: data.datas, e }); //Se envia la informacion a central
+      socket.emit("setExistencias", { data: data.datas }); //Se envia la informacion a central
     } catch (err) {
       console.log(err);
-      socket.emit("setExistencias", { registros: [], e }); //Se envia la informacion a central
+      socket.emit("setExistencias", { data: [] }); //Se envia la informacion a central
     }
   });
 
