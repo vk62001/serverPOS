@@ -88,14 +88,17 @@ const useSocket = (idTienda) => {
 
   socket.on("getExistenciasPOS", async (e) => {
     try {
-      const { data } = await SDKLocal.getInfo("ExistenciasTiendas/ByTienda",e.tiendaId);      
+      const { data } = await SDKLocal.getInfo(
+        "ExistenciasTiendas/ByTienda",
+        e.tiendaId
+      );
       socket.emit("setExistencias", { registros: data.datas, e }); //Se envia la informacion a central
     } catch (err) {
       console.log(err);
       socket.emit("setExistencias", { registros: [], e }); //Se envia la informacion a central
     }
   });
-  
+
   socket.on("disconnect", () => {
     console.log("user disconnected");
   });
