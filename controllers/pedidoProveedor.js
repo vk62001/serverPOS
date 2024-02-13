@@ -19,7 +19,7 @@ const pedidoProveedor = async (req, res) => {
     setTimeout(() => {
       axiosInsertData("PedidosProveedor", objData[0], id);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };
@@ -39,7 +39,7 @@ const updatePedidoProveedor = async (req, res) => {
     setTimeout(() => {
       axiosUpdateData("PedidosProveedor", id, objData[0]);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };

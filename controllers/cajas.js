@@ -18,7 +18,7 @@ const cajas = async (req, res) => {
     setTimeout(() => {
       axiosInsertData("Cajas", objData[0], id);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };
@@ -37,7 +37,7 @@ const updateCajas = async (req, res) => {
     setTimeout(() => {
       axiosUpdateData("Cajas", id, objData[0]);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };

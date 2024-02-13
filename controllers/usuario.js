@@ -18,7 +18,7 @@ const usuario = async (req, res) => {
     setTimeout(() => {
       axiosInsertData("Usuarios", objData[0], id);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };
@@ -37,7 +37,7 @@ const updateUsuario = async (req, res) => {
     setTimeout(() => {
       axiosUpdateData("Usuarios", id, objData[0]);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };

@@ -21,7 +21,7 @@ const deposito = async (req, res) => {
     setTimeout(() => {
       axiosInsertData("Depositos", objData[0], id);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };
@@ -43,7 +43,7 @@ const updateDeposito = async (req, res) => {
     setTimeout(() => {
       axiosUpdateData("Depositos", id, objData[0]);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };

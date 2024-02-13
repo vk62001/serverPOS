@@ -20,7 +20,7 @@ const ventas = async (req, res) => {
     setTimeout(() => {
       axiosInsertData("Ventas", objTemp, id);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };
@@ -39,7 +39,7 @@ const updateVentas = async (req, res) => {
     setTimeout(() => {
       axiosUpdateData("Ventas", id, objTemp);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };

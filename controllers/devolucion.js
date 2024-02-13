@@ -19,7 +19,7 @@ const devolucion = async (req, res) => {
     setTimeout(() => {
       axiosInsertData("Devoluciones", objData[0], id);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };
@@ -39,7 +39,7 @@ const updateDevolucion = async (req, res) => {
     setTimeout(() => {
       axiosUpdateData("Devoluciones", id, objData[0]);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };

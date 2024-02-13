@@ -19,7 +19,7 @@ const facturasAjusteInventario = async (req, res) => {
     setTimeout(() => {
       axiosInsertData("FacturasAjustesInventarios", objData[0], id);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };
@@ -39,7 +39,7 @@ const updateFacturasAjusteInventario = async (req, res) => {
     setTimeout(() => {
       axiosUpdateData("FacturasAjustesInventarios", id, objData[0]);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };

@@ -18,7 +18,7 @@ const password = async (req, res) => {
     setTimeout(() => {
       axiosInsertData("Passwords", objData[0], id);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };
@@ -37,7 +37,7 @@ const updatePassword = async (req, res) => {
     setTimeout(() => {
       axiosUpdateData("Passwords", id, objData[0]);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };

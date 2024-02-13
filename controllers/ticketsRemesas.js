@@ -19,7 +19,7 @@ const ticketsRemesas = async (req, res) => {
       //axiosInsertTicketsRemesas(objData[0], id); //
       axiosInsertData("TicketsRemesas", objData[0], id); //
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };
@@ -39,7 +39,7 @@ const updateTicketsRemesas = async (req, res) => {
       //axiosUpdateTicketsRemesas(id, objData[0]);
       axiosUpdateData("TicketsRemesas", id, objData[0]);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };

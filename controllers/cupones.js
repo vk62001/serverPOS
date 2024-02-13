@@ -19,7 +19,7 @@ const cupones = async (req, res) => {
     setTimeout(() => {
       axiosInsertData("Cupones", objData[0], id);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };
@@ -41,7 +41,7 @@ const updateCupones = async (req, res) => {
     setTimeout(() => {
       axiosUpdateData("Cupones", id, objData[0]);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };

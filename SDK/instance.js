@@ -6,7 +6,7 @@ console.log(URI, "Uri CENTRAL", Date());
 
 const APISQ = axios.create({
   baseURL: URI,
-  timeout: 5000,
+  timeout: 90000,
   headers: {
     Authorization: `Basic ${process.env.credentials}`,
     "Content-Type": "application/json",

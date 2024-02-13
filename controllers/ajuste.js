@@ -20,7 +20,7 @@ const ajuste = async (req, res) => {
     setTimeout(() => {
       axiosInsertData("Ajustes", objData[0], id);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };
@@ -41,7 +41,7 @@ const updateAjuste = async (req, res) => {
     setTimeout(() => {
       axiosUpdateData("Ajustes", id, objData[0]);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };

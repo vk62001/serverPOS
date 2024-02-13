@@ -43,6 +43,8 @@ const useSocket = (idTienda) => {
       tienda: idTienda,
       room: "kernel",
     },
+    reconnectionDelay: 10000, // defaults to 1000
+    reconnectionDelayMax: 10000, // defaults to 5000
     transports: ["websocket"],
     upgrade: false,
   });
@@ -99,14 +101,14 @@ const useSocket = (idTienda) => {
     }
   });
 
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
+  socket.on("disconnect", (reason, details) => {
+    console.log(reason, details, "desconexión");
   });
 
   socket.emit("test");
 };
 
-const iteracion = async (max = 2, intervalo = 10000) => {
+const iteracion = async (max = 12, intervalo = 15000) => {
   const url = `${process.env.URi_local}api/v1/Configuraciones`;
   console.log(url, "85 -- Iterando ", Date());
   for (let i = 0; i < max; i++) {
@@ -120,8 +122,7 @@ const iteracion = async (max = 2, intervalo = 10000) => {
       // console.log(data.datas[0].valor, 94);
       return data.datas[0].valor;
     } catch (error) {
-      i;
-      //console.log("error, iteración no: ", i, error, Date());
+      console.log("error, iteración no: ", i, error, Date());
       if (error.response) {
         if (error.response.data.message) {
         } else {

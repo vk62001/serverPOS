@@ -21,7 +21,7 @@ const historialCajero = async (req, res) => {
     setTimeout(() => {
       axiosInsertData("HistorialesCajeros", objData[0], id);
     }, 200);
-  }, 500);
+  }, 1000);
   res.status(200).send({ ok: true });
 };
 
@@ -42,7 +42,7 @@ const updateHistorialCajero = async (req, res) => {
     setTimeout(() => {
       axiosUpdateData("HistorialesCajeros", id, objData[0]);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };

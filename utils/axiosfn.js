@@ -13,21 +13,29 @@ const axiosInsertData = async (endPoint, obj, id) => {
     saveLog(endPoint, id, data.message, 1, 0);
     //se salva el log
   } catch (error) {
-    if (axios.isCancel(error)) {
-      console.log("La solicitud fue cancelada:", error.message);
-    } else if (error.response) {
+    // console.error(error, "error");
+    console.log(error, "axiosInsertData", Date());
+    if (error.response) {
       // El servidor respondió con un código de estado fuera del rango 2xx
-      console.error("Respuesta de error del servidor:", error.response.data);
+      console.error(
+        "Respuesta de error del servidor:",
+        error.response.data,
+        Date()
+      );
     } else if (error.request) {
       // La solicitud fue hecha pero no se recibió respuesta
-      console.error("No se recibió respuesta del servidor:", error.message);
+      console.error(
+        "No se recibió respuesta del servidor:",
+        error.message,
+        Date()
+      );
     } else {
       // Error desconocido
-      console.error("Error desconocido:", error.message);
+      console.error("Error desconocido:", error.message, Date());
     }
 
     //err.code  === 'ECONNREFUSED' no hay conexion con server
-    console.log(error, "39 - axiosInsertData", Date());
+    // console.log(error, "39 - axiosInsertData", Date());
     // console.log(err.response.data, "12");
 
     //se salva el log
@@ -48,20 +56,27 @@ const axiosUpdateData = async (endPoint, id, obj) => {
     // console.log(data, "--", obj);
     saveLog(endPoint, id, data.message, 1, 0);
   } catch (error) {
-    if (axios.isCancel(error)) {
-      console.log("La solicitud fue cancelada:", error.message);
-    } else if (error.response) {
+    console.log(error, "axiosUpdateData", Date());
+    if (error.response) {
       // El servidor respondió con un código de estado fuera del rango 2xx
-      console.error("Respuesta de error del servidor:", error.response.data);
+      console.error(
+        "Respuesta de error del servidor:",
+        error.response.data,
+        Date()
+      );
     } else if (error.request) {
       // La solicitud fue hecha pero no se recibió respuesta
-      console.error("No se recibió respuesta del servidor:", error.message);
+      console.error(
+        "No se recibió respuesta del servidor:",
+        error.message,
+        Date()
+      );
     } else {
       // Error desconocido
-      console.error("Error desconocido:", error.message);
+      console.error("Error desconocido:", error.message, Date());
     }
     //err.code  === 'ECONNREFUSED' no hay conexion con server
-    console.log(error, "60 -axiosUpdateData", Date());
+    // console.log(error, "60 -axiosUpdateData", Date());
     //se salva el log
     saveLog(endPoint, id, "Error update", 0, 0);
   }
@@ -69,8 +84,15 @@ const axiosUpdateData = async (endPoint, id, obj) => {
 
 const getInfo = async (proceso, id) => {
   try {
-    const { data } = await SDKLocal.getInfo(proceso, id);
-    return data.datas;
+    if (proceso === "Ventas") {
+      setTimeout(async () => {
+        const { data } = await SDKLocal.getInfo(proceso, id);
+        return data.datas;
+      }, 50000);
+    } else {
+      const { data } = await SDKLocal.getInfo(proceso, id);
+      return data.datas;
+    }
   } catch (err) {
     console.log(err, "71 - getInfo", Date());
   }
@@ -114,7 +136,7 @@ const mappingErrors = async (data) => {
         element.Proceso_Origen === "CountRegistros"
           ? responseLocal.data.data
           : eliminarPropiedadesVacias(responseLocal.data.datas[0]);
-      console.log(dataSend, "91 - processElement", Date());
+      // console.log(dataSend, "91 - processElement", Date());
       const responseCentral = await SDK.updateData(
         element.Proceso_Origen,
         element.Proceso_Origen_Id,
@@ -133,18 +155,24 @@ const mappingErrors = async (data) => {
         numberSuccess++;
       }
     } catch (error) {
+      console.log(error, "mappingErrors", Date());
       if (error.response) {
         // El servidor respondió con un código de estado fuera del rango 2xx
         console.error(
           "Respuesta de error del servidor:",
-          error.response.data.message
+          error.response.data.message,
+          Date()
         );
       } else if (error.request) {
         // La solicitud fue hecha pero no se recibió respuesta
-        console.error("No se recibió respuesta del servidor:", error.message);
+        console.error(
+          "No se recibió respuesta del servidor:",
+          error.message,
+          Date()
+        );
       } else {
         // Error desconocido
-        console.error("Error desconocido:", error.message);
+        console.error("Error desconocido:", error.message, Date());
       }
 
       // console.log(err, "error 35", 35);

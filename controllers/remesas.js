@@ -18,7 +18,7 @@ const remesas = async (req, res) => {
     setTimeout(() => {
       axiosInsertData("Remesas", objData[0], id);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };
@@ -37,7 +37,7 @@ const updateRemesas = async (req, res) => {
     setTimeout(() => {
       axiosUpdateData("Remesas", id, objData[0]);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };

@@ -19,7 +19,7 @@ const existenciasTiendas = async (req, res) => {
     setTimeout(() => {
       axiosInsertData("ExistenciasTiendas", objData[0], id);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };
@@ -39,7 +39,7 @@ const updateExistenciasTiendas = async (req, res) => {
     setTimeout(() => {
       axiosUpdateData("ExistenciasTiendas", id, objData[0]);
     }, 200);
-  }, 500);
+  }, 1000);
 
   res.status(200).send({ ok: true });
 };
