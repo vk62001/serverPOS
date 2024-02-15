@@ -1,11 +1,5 @@
-const { SDK } = require("../SDK/SDK");
-const { SDKLocal } = require("../SDK/SDKLocal");
-const { saveLog } = require("../SQLServer/SQL");
-const { eliminarPropiedadesVacias } = require("./utils");
 
-const crypto = require("crypto");
-
-const axiosInsertData = async (endPoint, obj, id) => {
+xiosInsertData = async (endPoint, obj, id) => {
   try {
     const { data } = await SDK.insertData(endPoint, obj);
     // console.log(data.message, "21", id);
@@ -190,10 +184,25 @@ const mappingErrors = async (data) => {
   return numberArray - numberSuccess;
 };
 
+
+//creame una funcion que se repita hasta que axios funcione y que me devuelva el valor de la respuesta
+
+async function repetirHastaExito(maxIntentos) {
+    for(let i = 0; i < maxIntentos; i++) {
+        try {
+            mappingErrors("")
+        } catch (error) {
+            console.error(`Intento ${i + 1} fallido. Error: ${error.message}`);
+        }
+    }
+    throw new Error(`No se pudo obtener la respuesta de ${url} después de ${maxIntentos} intentos`);
+}
+
+
 module.exports = {
   getInfo,
   getIdTienda,
-  axiosInsertData,
   axiosUpdateData,
   mappingErrors,
+  repetirHastaExito
 };
