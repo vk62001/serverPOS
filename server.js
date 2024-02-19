@@ -105,9 +105,19 @@ const useSocket = (idTienda) => {
   /* 
     solicitud de dataLog manualmente desde Central
   */
-  socket.on('getDataLogManually', async () => {
+  socket.on("getDataLogManually", async (e) => {
     const getDataLog = await getLog();
-    socket.emit("setDataLogManually", { data: getDataLog.recordset });
+    result = await mappingErrors(getDataLog.recordset);
+    // console.table(getDataLog.recordset);
+    console.log("fin del log");
+    // socket.emit("setDataLogManually", {
+    //   data: result + " logs no procesados",
+    //   e,
+    // });
+
+    const { data } = await SDKLocal.getInfo("CountRegistros", tiendaId);
+    // console.log(data);
+    socket.emit("setCountRegistros", { registros: data.data, e: e.e }); //Se envia la informacion a central
   });
 
   socket.on("disconnect", (reason, details) => {
