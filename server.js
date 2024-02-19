@@ -47,6 +47,8 @@ const useSocket = (idTienda) => {
     reconnectionDelayMax: 10000, // defaults to 5000
     transports: ["websocket"],
     upgrade: false,
+    pingInterval: 10000, // how often to ping/pong.
+    pingTimeout: 60000, // how long until the ping times out.
   });
 
   socket.on("connect", async () => {
@@ -99,6 +101,13 @@ const useSocket = (idTienda) => {
       console.log(err);
       socket.emit("setExistencias", { data: [] }); //Se envia la informacion a central
     }
+  });
+  /* 
+    solicitud de dataLog manualmente desde Central
+  */
+  socket.on('getDataLogManually', async () => {
+    const getDataLog = await getLog();
+    socket.emit("setDataLogManually", { data: getDataLog.recordset });
   });
 
   socket.on("disconnect", (reason, details) => {
@@ -157,3 +166,29 @@ const start = async () => {
     .catch((err) => console.log("no sirve esta mamada", Date()));
 };
 start();
+
+// const check = async () => {
+//   console.log("entra check");
+//   try {
+//     const {data} = await axios.get('http://192.168.192.45:5003/');
+//     console.log(data, "data ", new Date());
+//     if(data.data==='hola'){
+//       console.log("Todo bien, todo correcto", new Date());
+//       // const getDataLog = await getLog();
+//       // const result = await mappingErrors(getDataLog.recordset);
+//       // console.table(getDataLog.recordset);
+//       console.log("procesado");
+//       return;
+//     }
+//     console.log('no es hola', new Date());
+//   } catch (error) {
+//     console.log(error.code)
+//     if(error.code==="ETIMEDOUT" || error.code==="EHOSTDOWN"){
+//       console.log(error.message, Date());
+//       await delay(5000);
+//       check();
+//     }
+//   }
+// }
+
+// check();

@@ -1,6 +1,8 @@
 const delay = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
+
+
 const eliminarPropiedadesVacias = (obj) => {
   for (const clave in obj) {
     if (Array.isArray(obj[clave]) && obj[clave].length === 0) {
