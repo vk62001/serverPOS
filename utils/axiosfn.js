@@ -8,6 +8,12 @@ const crypto = require("crypto");
 const axiosInsertData = async (endPoint, obj, id) => {
   try {
     const { data } = await SDK.insertData(endPoint, obj);
+
+    if (endPoint === "Kardex") console.log(data);
+    //arregla cuando el sitio es marcado como bloqueado y no hay una respuesta
+    if (typeof data.message === "undefined" || data.message === null) {
+      saveLog(endPoint, id, "Error insert", 0, 0);
+    }
     // console.log(data.message, "21", id);
 
     saveLog(endPoint, id, data.message, 1, 0);
@@ -85,10 +91,16 @@ const axiosUpdateData = async (endPoint, id, obj) => {
 const getInfo = async (proceso, id) => {
   try {
     if (proceso === "Ventas") {
-      setTimeout(async () => {
-        const { data } = await SDKLocal.getInfo(proceso, id);
-        return data.datas;
-      }, 50000);
+      return new Promise((resolve, reject) => {
+        setTimeout(async () => {
+          try {
+            const { data } = await SDKLocal.getInfo(proceso, id);
+            resolve(data.datas);
+          } catch (err) {
+            reject(err);
+          }
+        }, 50000);
+      });
     } else {
       const { data } = await SDKLocal.getInfo(proceso, id);
       return data.datas;
