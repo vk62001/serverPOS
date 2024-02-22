@@ -1,7 +1,7 @@
 const { SDK } = require("../SDK/SDK");
 const { SDKLocal } = require("../SDK/SDKLocal");
 const { saveLog, getLog } = require("../SQLServer/SQL");
-const { eliminarPropiedadesVacias } = require("./utils");
+const { eliminarPropiedadesVacias, delay } = require("./utils");
 
 const crypto = require("crypto");
 
@@ -220,7 +220,7 @@ async function repetirHastaExito(maxIntentos) {
 
 
 const checkConexion = async () => {
-
+for (let i = 0; i < 4; i++) {
   try {
     const {data} = await axios.get(process.env.Uri_socket);
     if(data.data==='hola'){
@@ -231,16 +231,15 @@ const checkConexion = async () => {
       console.log(result, "logs no procesado en bucle");
       // } while (result > 0);
       console.table({ Resultado: "Todo procesado en bucle" });
-      return true;
+      break;
     }
   } catch (error) {
     if(error.code==="ETIMEDOUT" || error.code==="EHOSTDOWN" || error.code==="ECONNREFUSED" || error.code==="ECONNRESET" || error.code==="ENOTFOUND" || error.code === "ENETUNREACH"){
       console.log(error.message, Date());
-      await delay(10000);
-      // check();
-      return false;
     }
   }
+  await delay(10000);
+}
 }
 
 module.exports = {
