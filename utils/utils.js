@@ -1,3 +1,4 @@
+
 const delay = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
@@ -14,4 +15,6 @@ const eliminarPropiedadesVacias = (obj) => {
   return obj; // Devolver el objeto modificado
 };
 
-module.exports = { delay, eliminarPropiedadesVacias };
+
+
+module.exports = { delay, eliminarPropiedadesVacias};

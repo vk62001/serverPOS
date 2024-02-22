@@ -46,7 +46,6 @@ const axiosInsertData = async (endPoint, obj, id) => {
 
     //se salva el log
     await saveLog(endPoint, id, "Error insert", 0, 0);
-    await checkConexion();
     // console.log(err.response);
     // console.log("Error updating" + err.response.status + " .");
     // if (err.response.status != 405) {
@@ -192,7 +191,6 @@ const mappingErrors = async (data) => {
       //console.log(err, "111 - error processElement", Date());
       // // console.log(err.response.data, "error 35", 35);
       await saveLog("Reprocessing", "0", error.message, 1, 0);
-      await checkConexion();
     }
   };
 
@@ -219,28 +217,7 @@ async function repetirHastaExito(maxIntentos) {
 }
 
 
-const checkConexion = async () => {
-for (let i = 0; i < 4; i++) {
-  try {
-    const {data} = await axios.get(process.env.Uri_socket);
-    if(data.data==='hola'){
-      console.log("Todo bien, todo correcto", new Date());
-      //correr el log
-      const getDataLog = await getLog();
-      const result = await mappingErrors(getDataLog.recordset);
-      console.log(result, "logs no procesado en bucle");
-      // } while (result > 0);
-      console.table({ Resultado: "Todo procesado en bucle" });
-      break;
-    }
-  } catch (error) {
-    if(error.code==="ETIMEDOUT" || error.code==="EHOSTDOWN" || error.code==="ECONNREFUSED" || error.code==="ECONNRESET" || error.code==="ENOTFOUND" || error.code === "ENETUNREACH"){
-      console.log(error.message, Date());
-    }
-  }
-  await delay(10000);
-}
-}
+
 
 module.exports = {
   getInfo,
@@ -248,6 +225,5 @@ module.exports = {
   axiosInsertData,
   axiosUpdateData,
   mappingErrors,
-  repetirHastaExito,
-  checkConexion
+  repetirHastaExito
 };

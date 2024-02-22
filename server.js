@@ -8,8 +8,10 @@ const { SDKLocal } = require("./SDK/SDKLocal");
 const { mappingErrors } = require("./utils/axiosfn");
 const { delay } = require("./utils/utils");
 const axios = require("axios");
+const cron = require('node-cron');
 
 let socket;
+let flagLog=false;
 // App setup
 const PORT = 5001;
 const app = express();
@@ -33,6 +35,33 @@ app.get("/", async (req, res) => {
   // console.log(query,'--');
   res.status(200).send({ data: query });
 });
+
+
+const cronLog =async () => {
+  console.log('Ejecutando mi función cada minuto', new Date());
+  // Agrega aquí el código que deseas ejecutar cada minuto
+   //id de tienda
+    //revisar el log y el rollback
+    let result = 0;
+    // // do {
+     const getDataLog = await getLog();
+     result = await mappingErrors(getDataLog.recordset);
+    console.table(getDataLog.recordset);
+     console.log(
+       `${result} de ${getDataLog.recordset.length} logs no procesado`
+     );
+    // } while (result > 0);
+    console.table({ Resultado: "Todo procesado" });
+}
+
+// Configura el cron job para que se ejecute cada minuto
+cron.schedule('* * * * *', () => {
+  if(flagLog){
+    console.log('Ejecutando mi función cada minuto', new Date());
+    cronLog();
+  }
+});
+
 
 const useSocket = (idTienda) => {
   const URi = process.env.Uri_sockets;
@@ -64,6 +93,7 @@ const useSocket = (idTienda) => {
      );
     // } while (result > 0);
     console.table({ Resultado: "Todo procesado" });
+    flagLog=true;
   });
 
   socket.on("reconnection_attempt", async () => {
@@ -121,6 +151,7 @@ const useSocket = (idTienda) => {
 
   socket.on("disconnect", (reason, details) => {
     console.log(reason, details, "desconexión");
+    flagLog=false;
   });
 
   socket.emit("test");
@@ -158,12 +189,15 @@ const iteracion = async (max = 12, intervalo = 15000) => {
         // Error desconocido
         console.error("Error desconocido:", error.message);
       }
-
       await delay(intervalo);
+      flagLog =false;
     }
   }
   throw new Error("No sirve esta chingadera");
 };
+
+
+
 
 const start = async () => {
   iteracion()
