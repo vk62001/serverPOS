@@ -35,8 +35,8 @@ app.get("/", async (req, res) => {
 });
 
 const useSocket = (idTienda) => {
-  const URi = process.env.URi_sockets;
-  // console.log(URi);
+  const URi = process.env.Uri_sockets;
+  console.log(URi);
 
   socket = io.connect(URi, {
     query: {
@@ -50,19 +50,18 @@ const useSocket = (idTienda) => {
     pingInterval: 10000, // how often to ping/pong.
     pingTimeout: 60000, // how long until the ping times out.
   });
-
   socket.on("connect", async () => {
     console.log("connected", Date());
     //id de tienda
     //revisar el log y el rollback
-    let result = 0;
-    // do {
-    const getDataLog = await getLog();
-    result = await mappingErrors(getDataLog.recordset);
-    // console.table(getDataLog.recordset);
-    console.log(
-      `${result} de ${getDataLog.recordset.length} logs no procesado`
-    );
+     let result = 0;
+    // // do {
+     const getDataLog = await getLog();
+     result = await mappingErrors(getDataLog.recordset);
+    console.table(getDataLog.recordset);
+     console.log(
+       `${result} de ${getDataLog.recordset.length} logs no procesado`
+     );
     // } while (result > 0);
     console.table({ Resultado: "Todo procesado" });
   });
@@ -177,28 +176,3 @@ const start = async () => {
 };
 start();
 
-// const check = async () => {
-//   console.log("entra check");
-//   try {
-//     const {data} = await axios.get('http://192.168.192.45:5003/');
-//     console.log(data, "data ", new Date());
-//     if(data.data==='hola'){
-//       console.log("Todo bien, todo correcto", new Date());
-//       // const getDataLog = await getLog();
-//       // const result = await mappingErrors(getDataLog.recordset);
-//       // console.table(getDataLog.recordset);
-//       console.log("procesado");
-//       return;
-//     }
-//     console.log('no es hola', new Date());
-//   } catch (error) {
-//     console.log(error.code)
-//     if(error.code==="ETIMEDOUT" || error.code==="EHOSTDOWN"){
-//       console.log(error.message, Date());
-//       await delay(5000);
-//       check();
-//     }
-//   }
-// }
-
-// check();

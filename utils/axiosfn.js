@@ -1,6 +1,6 @@
 const { SDK } = require("../SDK/SDK");
 const { SDKLocal } = require("../SDK/SDKLocal");
-const { saveLog } = require("../SQLServer/SQL");
+const { saveLog, getLog } = require("../SQLServer/SQL");
 const { eliminarPropiedadesVacias } = require("./utils");
 
 const crypto = require("crypto");
@@ -45,8 +45,8 @@ const axiosInsertData = async (endPoint, obj, id) => {
     // console.log(err.response.data, "12");
 
     //se salva el log
-    saveLog(endPoint, id, "Error insert", 0, 0);
-
+    await saveLog(endPoint, id, "Error insert", 0, 0);
+    await checkConexion();
     // console.log(err.response);
     // console.log("Error updating" + err.response.status + " .");
     // if (err.response.status != 405) {
@@ -192,6 +192,7 @@ const mappingErrors = async (data) => {
       //console.log(err, "111 - error processElement", Date());
       // // console.log(err.response.data, "error 35", 35);
       await saveLog("Reprocessing", "0", error.message, 1, 0);
+      await checkConexion();
     }
   };
 
@@ -217,6 +218,31 @@ async function repetirHastaExito(maxIntentos) {
   );
 }
 
+
+const checkConexion = async () => {
+
+  try {
+    const {data} = await axios.get(process.env.Uri_socket);
+    if(data.data==='hola'){
+      console.log("Todo bien, todo correcto", new Date());
+      //correr el log
+      const getDataLog = await getLog();
+      const result = await mappingErrors(getDataLog.recordset);
+      console.log(result, "logs no procesado en bucle");
+      // } while (result > 0);
+      console.table({ Resultado: "Todo procesado en bucle" });
+      return true;
+    }
+  } catch (error) {
+    if(error.code==="ETIMEDOUT" || error.code==="EHOSTDOWN" || error.code==="ECONNREFUSED" || error.code==="ECONNRESET" || error.code==="ENOTFOUND" || error.code === "ENETUNREACH"){
+      console.log(error.message, Date());
+      await delay(10000);
+      // check();
+      return false;
+    }
+  }
+}
+
 module.exports = {
   getInfo,
   getIdTienda,
@@ -224,4 +250,5 @@ module.exports = {
   axiosUpdateData,
   mappingErrors,
   repetirHastaExito,
+  checkConexion
 };
