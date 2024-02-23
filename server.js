@@ -11,7 +11,7 @@ const axios = require("axios");
 const cron = require('node-cron');
 
 let socket;
-let flagLog=false;
+let flagLog = false;
 // App setup
 const PORT = 5001;
 const app = express();
@@ -37,27 +37,24 @@ app.get("/", async (req, res) => {
 });
 
 
-const cronLog =async () => {
-  console.log('Ejecutando mi función cada minuto', new Date());
-  // Agrega aquí el código que deseas ejecutar cada minuto
-   //id de tienda
-    //revisar el log y el rollback
-    let result = 0;
-    // // do {
-     const getDataLog = await getLog();
-     result = await mappingErrors(getDataLog.recordset);
+const cronLog = async () => {
+  let result = 0;
+  // // do {
+  const getDataLog = await getLog();
+  if (getDataLog.recordset.length) {
+    result = await mappingErrors(getDataLog.recordset);
     console.table(getDataLog.recordset);
-     console.log(
-       `${result} de ${getDataLog.recordset.length} logs no procesado`
-     );
+    console.log(
+      `${result} de ${getDataLog.recordset.length} logs no procesado`
+    );
     // } while (result > 0);
     console.table({ Resultado: "Todo procesado" });
+  }
 }
 
 // Configura el cron job para que se ejecute cada minuto
 cron.schedule('* * * * *', () => {
-  if(flagLog){
-    console.log('Ejecutando mi función cada minuto', new Date());
+  if (flagLog) {
     cronLog();
   }
 });
@@ -83,17 +80,17 @@ const useSocket = (idTienda) => {
     console.log("connected", Date());
     //id de tienda
     //revisar el log y el rollback
-     let result = 0;
+    let result = 0;
     // // do {
-     const getDataLog = await getLog();
-     result = await mappingErrors(getDataLog.recordset);
+    const getDataLog = await getLog();
+    result = await mappingErrors(getDataLog.recordset);
     console.table(getDataLog.recordset);
-     console.log(
-       `${result} de ${getDataLog.recordset.length} logs no procesado`
-     );
+    console.log(
+      `${result} de ${getDataLog.recordset.length} logs no procesado`
+    );
     // } while (result > 0);
     console.table({ Resultado: "Todo procesado" });
-    flagLog=true;
+    flagLog = true;
   });
 
   socket.on("reconnection_attempt", async () => {
@@ -105,6 +102,7 @@ const useSocket = (idTienda) => {
     console.log(result, "logs no procesado");
     // } while (result > 0);
     console.table({ Resultado: "Todo procesado" });
+    flagLog = true;
   });
 
   socket.on("getCountRegistrosPOS", async (e) => {
@@ -151,7 +149,7 @@ const useSocket = (idTienda) => {
 
   socket.on("disconnect", (reason, details) => {
     console.log(reason, details, "desconexión");
-    flagLog=false;
+    flagLog = false;
   });
 
   socket.emit("test");
@@ -190,7 +188,7 @@ const iteracion = async (max = 12, intervalo = 15000) => {
         console.error("Error desconocido:", error.message);
       }
       await delay(intervalo);
-      flagLog =false;
+      flagLog = false;
     }
   }
   throw new Error("No sirve esta chingadera");
