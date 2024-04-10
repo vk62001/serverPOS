@@ -8,7 +8,7 @@ const { SDKLocal } = require("./SDK/SDKLocal");
 const { mappingErrors } = require("./utils/axiosfn");
 const { delay } = require("./utils/utils");
 const axios = require("axios");
-const cron = require('node-cron');
+const cron = require("node-cron");
 
 let socket;
 let flagLog = false;
@@ -36,37 +36,35 @@ app.get("/", async (req, res) => {
   res.status(200).send({ data: query });
 });
 
-
 const cronLog = async () => {
   let result = 0;
   // // do {
   const getDataLog = await getLog();
   if (getDataLog.recordset.length) {
     result = await mappingErrors(getDataLog.recordset);
-    console.table(getDataLog.recordset);
+    // console.table(getDataLog.recordset);
     console.log(
       `${result} de ${getDataLog.recordset.length} logs no procesado`
     );
     // } while (result > 0);
-    console.table({ Resultado: "Todo procesado" });
+    // console.table({ Resultado: "todoos procesado" });
   }
 }
 
-// Configura el cron job para que se ejecute cada minuto
-cron.schedule('* * * * *', () => {
+// Configura el cron job para que se ejecute cada 3 minutos
+cron.schedule("*/3 * * * *", () => {
   if (flagLog) {
     cronLog();
   }
 });
 
-
-const useSocket = (idTienda) => {
+const useSocket = (tiendaId) => {
   const URi = process.env.Uri_sockets;
   console.log(URi);
 
   socket = io.connect(URi, {
     query: {
-      tienda: idTienda,
+      tienda: tiendaId,
       room: "kernel",
     },
     reconnectionDelay: 10000, // defaults to 1000
@@ -133,15 +131,14 @@ const useSocket = (idTienda) => {
     solicitud de dataLog manualmente desde Central
   */
   socket.on("getDataLogManually", async (e) => {
-    const getDataLog = await getLog();
-    result = await mappingErrors(getDataLog.recordset);
+    const getDataLog = await getLog(true);
+    const result = await mappingErrors(getDataLog.recordset);
     // console.table(getDataLog.recordset);
-    console.log("fin del log");
+    console.log(result, "fin del log");
     // socket.emit("setDataLogManually", {
     //   data: result + " logs no procesados",
     //   e,
     // });
-
     const { data } = await SDKLocal.getInfo("CountRegistros", tiendaId);
     // console.log(data);
     socket.emit("setCountRegistros", { registros: data.data, e: e.e }); //Se envia la informacion a central
@@ -155,7 +152,7 @@ const useSocket = (idTienda) => {
   socket.emit("test");
 };
 
-const iteracion = async (max = 12, intervalo = 15000) => {
+const iteracion = async (max = 20, intervalo = 20000) => {
   const url = `${process.env.URi_local}api/v1/Configuraciones`;
   console.log(url, "85 -- Iterando ", Date());
   for (let i = 0; i < max; i++) {
@@ -172,13 +169,10 @@ const iteracion = async (max = 12, intervalo = 15000) => {
       console.log("error, iteración no: ", i, error, Date());
       if (error.response) {
         if (error.response.data.message) {
+          console.log(error.response.data.message,"error.response.data.message");
         } else {
           // El servidor respondió con un código de estado fuera del rango 2xx
-          console.error(
-            "Respuesta de error del servidor:",
-            error.response.status,
-            error.response.statusText
-          );
+          console.error("Respuesta de error del servidor:",error.response.status,error.response.statusText);
         }
       } else if (error.request) {
         // La solicitud fue hecha pero no se recibió respuesta
@@ -193,18 +187,14 @@ const iteracion = async (max = 12, intervalo = 15000) => {
   }
   throw new Error("No sirve esta chingadera");
 };
-
-
-
-
+// let tiendaId
 const start = async () => {
   iteracion()
-    .then((res) => {
-      console.log(res, "Socket Conectado ", Date());
-      tiendaId = res;
-      useSocket(res);
+    .then((idTienda) => {
+      console.log(idTienda, "Socket Conectado ", Date());
+      // tiendaId = res;
+      useSocket(idTienda);
     })
     .catch((err) => console.log("no sirve esta mamada", Date()));
 };
 start();
-

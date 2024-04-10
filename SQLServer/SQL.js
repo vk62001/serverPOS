@@ -22,7 +22,7 @@ const saveLog = async (spName, id, process, estatus, opc) => {
   const pool = await new sql.ConnectionPool(config).connect();
   const request = pool.request();
   try {
-    const result = await request
+    await request
       .input("Proceso", spName)
       .input("Id", id)
       .input("Mensage", process)
@@ -35,13 +35,16 @@ const saveLog = async (spName, id, process, estatus, opc) => {
   pool.close();
 };
 
-const getLog = async () => {
+const getLog = async (manualy = false) => {
   const poolConnection = await new sql.ConnectionPool(config).connect();
   const request = poolConnection.request();
   try {
-    var resultLog = await request.query(
-      `select id, Proceso_Origen, tienda_id, Proceso_Origen_Id, Mensage, estatus, date_created from SQT_LogComunicacion where estatus = 0  order by date_created asc `
+    const resultLog = await request.query(
+      `select id, Proceso_Origen, tienda_id, Proceso_Origen_Id, Mensage, estatus, date_created from SQT_LogComunicacion WITH(NOLOCK) where estatus = 0  order by date_created asc `
     );
+    // console.log("antes delayed");
+    !manualy && (await new Promise((resolve) => setTimeout(resolve, 60000)));
+    // console.log("despues delayed");
     return resultLog;
   } catch (err) {
     console.error(err.message, Date());
@@ -50,53 +53,50 @@ const getLog = async () => {
 };
 
 const getInfo = async (tiendaId) => {
-  // const poolConnection = await sql.connect(config);
+  // // const poolConnection = await sql.connect(config);
+  // // try {
+  // //   const { recordset } = await poolConnection
+  // //     .request()
+  // //     .input("IdTienda", 334)
+  // //     .input("Opc", 0)
+  // //     .execute("SQSP_ConteoComunicacion");
+  // //   //  console.log(recordset, 59);
+  // //   return recordset;
+  // // } catch (err) {
+  // //   console.error(err.message);
+  // // }
+  // // poolConnection.close();
+  // const pool = await sql.connect(config);
   // try {
-  //   const { recordset } = await poolConnection
+  //   const data = await pool
   //     .request()
-  //     .input("IdTienda", 334)
-  //     .input("Opc", 0)
-  //     .execute("SQSP_ConteoComunicacion");
-  //   //  console.log(recordset, 59);
-
-  //   return recordset;
+  //     .input("id", tiendaId)
+  //     .input("Source", "")
+  //     .input("AperturasTiendas", 0)
+  //     .input("HistorialesCajeros", 0)
+  //     .input("Ventas", 0)
+  //     .input("DevolucionesVentas", 0)
+  //     .input("TicketsRemesas", 0)
+  //     .input("Remesas", 0)
+  //     .input("Pedidos", 0)
+  //     .input("PedidosProveedor", 0)
+  //     .input("Devoluciones", 0)
+  //     .input("Depositos", 0)
+  //     .input("RetirosCaja", 0)
+  //     .input("FacturasAjustesInventarios", 0)
+  //     .input("Ajustes", 0)
+  //     .input("Inventarios", 0)
+  //     .input("Cupones", 0)
+  //     .input("Kardex", 0)
+  //     .input("opcion", 3)
+  //     .input("Result", 0)
+  //     .execute("SQCOM_CountRegistros");
+  //   // console.log(data.recordsets);
+  //   return data;
   // } catch (err) {
-  //   console.error(err.message);
+  //   console.log(err);
   // }
-  // poolConnection.close();
-
-  const pool = await sql.connect(config);
-
-  try {
-    const data = await pool
-      .request()
-      .input("id", tiendaId)
-      .input("Source", "")
-      .input("AperturasTiendas", 0)
-      .input("HistorialesCajeros", 0)
-      .input("Ventas", 0)
-      .input("DevolucionesVentas", 0)
-      .input("TicketsRemesas", 0)
-      .input("Remesas", 0)
-      .input("Pedidos", 0)
-      .input("PedidosProveedor", 0)
-      .input("Devoluciones", 0)
-      .input("Depositos", 0)
-      .input("RetirosCaja", 0)
-      .input("FacturasAjustesInventarios", 0)
-      .input("Ajustes", 0)
-      .input("Inventarios", 0)
-      .input("Cupones", 0)
-      .input("Kardex", 0)
-      .input("opcion", 3)
-      .input("Result", 0)
-      .execute("SQCOM_CountRegistros");
-    console.log(data.recordsets);
-    return data;
-  } catch (err) {
-    console.log(err);
-  }
-  pool.close();
+  // pool.close();
 };
 module.exports = {
   getTable,

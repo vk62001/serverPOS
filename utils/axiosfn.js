@@ -9,15 +9,11 @@ const axiosInsertData = async (endPoint, obj, id) => {
   try {
     const { data } = await SDK.insertData(endPoint, obj);
 
-    if (endPoint === "Kardex") console.log(data);
-    //arregla cuando el sitio es marcado como bloqueado y no hay una respuesta
     if (typeof data.message === "undefined" || data.message === null) {
-      saveLog(endPoint, id, "Error insert", 0, 0);
+      saveLog(endPoint, id, "Error undefined insert", 0, 0);
+    } else {
+      saveLog(endPoint, id, data.message, 1, 0);
     }
-    // console.log(data.message, "21", id);
-
-    saveLog(endPoint, id, data.message, 1, 0);
-    //se salva el log
   } catch (error) {
     // console.error(error, "error");
     console.log(error, "axiosInsertData", Date());
@@ -59,7 +55,11 @@ const axiosUpdateData = async (endPoint, id, obj) => {
     const { data } = await SDK.updateData(endPoint, id, obj);
     //se salva el log
     // console.log(data, "--", obj);
-    saveLog(endPoint, id, data.message, 1, 0);
+    if (typeof data.message === "undefined" || data.message === null) {
+      saveLog(endPoint, id, "Error undefined insert", 0, 0);
+    } else {
+      saveLog(endPoint, id, data.message, 1, 0);
+    }
   } catch (error) {
     console.log(error, "axiosUpdateData", Date());
     if (error.response) {
@@ -87,25 +87,36 @@ const axiosUpdateData = async (endPoint, id, obj) => {
   }
 };
 
-const getInfo = async (proceso, id) => {
+const getInfo = async (proceso, id, reproceso = false) => {
   try {
-    if (proceso === "Ventas") {
-      return new Promise((resolve, reject) => {
-        setTimeout(async () => {
-          try {
-            const { data } = await SDKLocal.getInfo(proceso, id);
-            resolve(data.datas);
-          } catch (err) {
-            reject(err);
-          }
-        }, 50000);
-      });
-    } else {
-      const { data } = await SDKLocal.getInfo(proceso, id);
-      return data.datas;
+    if (
+      !reproceso &&
+      (proceso === "Devoluciones" ||
+        proceso === "DevolucionesVentas" ||
+        proceso === "Inventarios" ||
+        // proceso === "Pedidos" ||
+        proceso === "PedidosProveedor" ||
+        proceso === "Ventas")
+    ) {
+      // return new Promise((resolve, reject) => {
+      //   setTimeout(async () => {
+      //     try {
+      //       const { data } = await SDKLocal.getInfo(proceso, id);
+      //       resolve(data.datas);
+      //     } catch (err) {
+      //       reject(err);
+      //     }
+      //   }, 50000);
+      // });
+      saveLog(proceso, id, "primera vez", 0, 0);
     }
+    // else {
+    const { data } = await SDKLocal.getInfo(proceso, id);
+    return data.datas;
+    // }
   } catch (err) {
     console.log(err, "71 - getInfo", Date());
+    return [];
   }
 };
 
@@ -131,38 +142,31 @@ const mappingErrors = async (data) => {
 
   const processElement = async (element) => {
     // console.log(element);
+    const { Proceso_Origen, Proceso_Origen_Id, id } = element;
     try {
       const claveregistro =
-        element.Proceso_Origen === "CountRegistros"
-          ? ""
-          : element.Proceso_Origen_Id;
+        Proceso_Origen === "CountRegistros" ? "" : Proceso_Origen_Id;
       // console.log("id", claveregistro, 77);
 
       const responseLocal = await SDKLocal.getInfo(
-        element.Proceso_Origen,
+        Proceso_Origen,
         claveregistro
       );
       // console.log(responseLocal.data, 83);
       const dataSend =
-        element.Proceso_Origen === "CountRegistros"
+        Proceso_Origen === "CountRegistros"
           ? responseLocal.data.data
           : eliminarPropiedadesVacias(responseLocal.data.datas[0]);
       // console.log(dataSend, "91 - processElement", Date());
       const responseCentral = await SDK.updateData(
-        element.Proceso_Origen,
-        element.Proceso_Origen_Id,
+        Proceso_Origen,
+        Proceso_Origen_Id,
         dataSend
       );
       // console.log(responseCentral.data, "try");
       if (responseCentral.data.succeeded) {
         // console.log("entra guarda log");
-        await saveLog(
-          element.Proceso_Origen,
-          element.id,
-          "Reproceso correcto",
-          1,
-          1
-        );
+        await saveLog(Proceso_Origen, id, "Reproceso correcto", 1, 1);
         numberSuccess++;
       }
     } catch (error) {
@@ -190,7 +194,7 @@ const mappingErrors = async (data) => {
 
       //console.log(err, "111 - error processElement", Date());
       // // console.log(err.response.data, "error 35", 35);
-      await saveLog("Reprocessing", "0", error.message, 1, 0);
+      await saveLog("Reprocessing", "0", error.message, 0, 1);
     }
   };
 
@@ -206,7 +210,7 @@ const mappingErrors = async (data) => {
 async function repetirHastaExito(maxIntentos) {
   for (let i = 0; i < maxIntentos; i++) {
     try {
-      mappingErrors("");
+      await mappingErrors("");
     } catch (error) {
       console.error(`Intento ${i + 1} fallido. Error: ${error.message}`);
     }
@@ -216,14 +220,11 @@ async function repetirHastaExito(maxIntentos) {
   );
 }
 
-
-
-
 module.exports = {
   getInfo,
   getIdTienda,
   axiosInsertData,
   axiosUpdateData,
   mappingErrors,
-  repetirHastaExito
+  repetirHastaExito,
 };
