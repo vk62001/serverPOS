@@ -1,9 +1,9 @@
-const { apertura, updateApertura } = require('../controllers/apertura');
+const { apertura, updateApertura } = require("../controllers/apertura");
 
-const router = require('express').Router();
+const router = require("express").Router();
 
-router.post('/', apertura);
+router.post("/", apertura);
 
-router.put('/', updateApertura);
+router.put("/", updateApertura);
 
-module.exports = router
+module.exports = router;
