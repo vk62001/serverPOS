@@ -1,11 +1,11 @@
 const {
   getInfo,
-  axiosInsertData,
-  axiosUpdateData,
+  socketInsertData,
+  socketUpdateData,
 } = require("../utils/axiosfn");
 
 const pedidoProveedor = async (req, res) => {
-  const { code, id } = req.body;
+  const { code, id, uuid } = req.body;
   // console.log(code, id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -17,7 +17,7 @@ const pedidoProveedor = async (req, res) => {
 
     if (objData.length === 0) return;
     setTimeout(() => {
-      axiosInsertData("PedidosProveedor", objData[0], id);
+      socketInsertData("PedidosProveedor", objData[0], id, uuid);
     }, 200);
   }, 1000);
 
@@ -25,7 +25,7 @@ const pedidoProveedor = async (req, res) => {
 };
 
 const updatePedidoProveedor = async (req, res) => {
-  const { id } = req.body;
+  const { id, uuid } = req.body;
   // console.log(id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -37,7 +37,7 @@ const updatePedidoProveedor = async (req, res) => {
 
     if (objData.length === 0) return;
     setTimeout(() => {
-      axiosUpdateData("PedidosProveedor", id, objData[0]);
+      socketUpdateData("PedidosProveedor", id, objData[0], uuid);
     }, 200);
   }, 1000);
 

@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const { getTable, getLog, getInfo } = require("./SQLServer/SQL");
+const { getTable, getLog, saveLog } = require("./SQLServer/SQL");
 const apiRouter = require("./routes");
 const { io } = require("socket.io-client");
 const { SDKLocal } = require("./SDK/SDKLocal");
@@ -9,6 +9,7 @@ const { mappingErrors } = require("./utils/axiosfn");
 const { delay } = require("./utils/utils");
 const axios = require("axios");
 const cron = require("node-cron");
+const { getSocketInit, setSocketInit } = require("./utils/globalVars");
 
 let socket;
 let flagLog = false;
@@ -44,7 +45,7 @@ const cronLog = async () => {
     result = await mappingErrors(getDataLog.recordset);
     // console.table(getDataLog.recordset);
     console.log(
-      `${result} de ${getDataLog.recordset.length} logs no procesado`
+      `${result} de ${getDataLog.recordset.length} logs no procesado cron`
     );
     // } while (result > 0);
     // console.table({ Resultado: "todoos procesado" });
@@ -74,6 +75,7 @@ const useSocket = (tiendaId) => {
     pingInterval: 10000, // how often to ping/pong.
     pingTimeout: 60000, // how long until the ping times out.
   });
+
   socket.on("connect", async () => {
     console.log("connected", Date());
     //id de tienda
@@ -82,14 +84,16 @@ const useSocket = (tiendaId) => {
     // // do {
     const getDataLog = await getLog();
     result = await mappingErrors(getDataLog.recordset);
-    console.table(getDataLog.recordset);
+    // console.table(getDataLog.recordset);
     console.log(
-      `${result} de ${getDataLog.recordset.length} logs no procesado`
+      `${result} de ${getDataLog.recordset.length} logs no procesado in connected`
     );
     // } while (result > 0);
     console.table({ Resultado: "Todo procesado" });
     flagLog = true;
   });
+
+  setSocketInit(socket);
 
   socket.on("reconnection_attempt", async () => {
     let result = 0;
@@ -145,10 +149,16 @@ const useSocket = (tiendaId) => {
   });
 
   socket.on("disconnect", (reason, details) => {
-    console.log(reason, details, "desconexión");
+    console.table(reason);
+    console.table(details);
     flagLog = false;
   });
 
+  socket.on("callBack", (data) => {
+    // console.log("regrso bien!", data);
+    const { endPoint, id, message, estatus, opc, uuid } = data;
+    saveLog(endPoint, id, message, estatus, opc, uuid);
+  });
   socket.emit("test");
 };
 

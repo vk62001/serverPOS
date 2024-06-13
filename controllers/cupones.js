@@ -1,10 +1,10 @@
 const {
   getInfo,
-  axiosInsertData,
-  axiosUpdateData,
+  socketUpdateData,
+  socketInsertData,
 } = require("../utils/axiosfn");
 const cupones = async (req, res) => {
-  const { code, id } = req.body;
+  const { code, id, uuid } = req.body;
   // console.log(code, id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -14,10 +14,9 @@ const cupones = async (req, res) => {
     const objData = await getInfo("Cupones", id);
     // console.log(objData, "-");
 
-    if(objData.length===0)
-      return;
+    if (objData.length === 0) return;
     setTimeout(() => {
-      axiosInsertData("Cupones", objData[0], id);
+      socketInsertData("Cupones", objData[0], id, uuid);
     }, 200);
   }, 1000);
 
@@ -25,7 +24,7 @@ const cupones = async (req, res) => {
 };
 
 const updateCupones = async (req, res) => {
-  const { id } = req.body;
+  const { id, uuid } = req.body;
   // console.log(id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -35,11 +34,9 @@ const updateCupones = async (req, res) => {
     const objData = await getInfo("Cupones", id);
     // console.log(objData, "-");
 
-    
-    if(objData.length===0)
-      return;
+    if (objData.length === 0) return;
     setTimeout(() => {
-      axiosUpdateData("Cupones", id, objData[0]);
+      socketUpdateData("Cupones", id, objData[0], uuid);
     }, 200);
   }, 1000);
 

@@ -1,11 +1,11 @@
 const {
   getInfo,
-  axiosInsertData,
-  axiosUpdateData,
+  socketInsertData,
+  socketUpdateData,
 } = require("../utils/axiosfn");
 
 const ticketsRemesas = async (req, res) => {
-  const { code, id } = req.body;
+  const { code, id, uuid } = req.body;
   // console.log(code, id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -16,8 +16,7 @@ const ticketsRemesas = async (req, res) => {
     // console.log(objData, "-");
 
     setTimeout(() => {
-      //axiosInsertTicketsRemesas(objData[0], id); //
-      axiosInsertData("TicketsRemesas", objData[0], id); //
+      socketInsertData("TicketsRemesas", objData[0], id, uuid);
     }, 200);
   }, 1000);
 
@@ -25,7 +24,7 @@ const ticketsRemesas = async (req, res) => {
 };
 
 const updateTicketsRemesas = async (req, res) => {
-  const { id } = req.body;
+  const { id, uuid } = req.body;
   // console.log(id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -36,8 +35,7 @@ const updateTicketsRemesas = async (req, res) => {
     // console.log(objData, "-");
 
     setTimeout(() => {
-      //axiosUpdateTicketsRemesas(id, objData[0]);
-      axiosUpdateData("TicketsRemesas", id, objData[0]);
+      socketUpdateData("TicketsRemesas", id, objData[0], uuid);
     }, 200);
   }, 1000);
 

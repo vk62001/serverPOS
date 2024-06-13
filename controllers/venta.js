@@ -1,12 +1,12 @@
 const {
   getInfo,
-  axiosInsertData,
-  axiosUpdateData,
+  socketInsertData,
+  socketUpdateData,
 } = require("../utils/axiosfn");
 const { eliminarPropiedadesVacias } = require("../utils/utils");
 
 const ventas = async (req, res) => {
-  const { code, id } = req.body;
+  const { code, id, uuid } = req.body;
   // console.log(code, id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -14,11 +14,12 @@ const ventas = async (req, res) => {
   }
   setTimeout(async () => {
     const objData = await getInfo("Ventas", id);
-    //console.log(objData, "-");
+    if (objData?.length === 0) return;
+    // console.log(objData, "-");
     const objTemp = eliminarPropiedadesVacias(objData[0]);
     // console.log("objTemp", objTemp);
     setTimeout(() => {
-      axiosInsertData("Ventas", objTemp, id);
+      socketInsertData("Ventas", objTemp, id, uuid);
     }, 200);
   }, 1000);
 
@@ -26,8 +27,8 @@ const ventas = async (req, res) => {
 };
 
 const updateVentas = async (req, res) => {
-  const { id } = req.body;
-  // console.log(id);
+  const { id, uuid } = req.body;
+  // console.log(id, uuid);
   if (id === undefined) {
     res.status(200).send({ ok: true });
     return;
@@ -37,7 +38,7 @@ const updateVentas = async (req, res) => {
     // console.log(objData, "-");
     const objTemp = eliminarPropiedadesVacias(objData[0]);
     setTimeout(() => {
-      axiosUpdateData("Ventas", id, objTemp);
+      socketUpdateData("Ventas", id, objData[0], uuid);
     }, 200);
   }, 1000);
 

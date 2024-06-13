@@ -18,13 +18,15 @@ const getTable = async (table) => {
   poolConnection.close();
 };
 
-const saveLog = async (spName, id, process, estatus, opc) => {
+const saveLog = async (spName, id, process, estatus, opc, uuid) => {
+  // console.log("Parametros ", spName, id, process, estatus, opc, uuid);
   const pool = await new sql.ConnectionPool(config).connect();
   const request = pool.request();
   try {
     await request
+      .input("Id", uuid)
       .input("Proceso", spName)
-      .input("Id", id)
+      .input("ProcessId", id)
       .input("Mensage", process)
       .input("Estatus", estatus)
       .input("Opc", opc)
@@ -40,7 +42,7 @@ const getLog = async (manualy = false) => {
   const request = poolConnection.request();
   try {
     const resultLog = await request.query(
-      `select id, Proceso_Origen, tienda_id, Proceso_Origen_Id, Mensage, estatus, date_created from SQT_LogComunicacion WITH(NOLOCK) where estatus = 0  order by date_created asc `
+      `select id, Proceso_Origen, tienda_id, Proceso_Origen_Id, Mensage, estatus, date_created from SQT_LogComunicacionSockets WITH(NOLOCK) where estatus = 0  order by date_created asc `
     );
     // console.log("antes delayed");
     !manualy && (await new Promise((resolve) => setTimeout(resolve, 60000)));
@@ -52,55 +54,8 @@ const getLog = async (manualy = false) => {
   await poolConnection.close();
 };
 
-const getInfo = async (tiendaId) => {
-  // // const poolConnection = await sql.connect(config);
-  // // try {
-  // //   const { recordset } = await poolConnection
-  // //     .request()
-  // //     .input("IdTienda", 334)
-  // //     .input("Opc", 0)
-  // //     .execute("SQSP_ConteoComunicacion");
-  // //   //  console.log(recordset, 59);
-  // //   return recordset;
-  // // } catch (err) {
-  // //   console.error(err.message);
-  // // }
-  // // poolConnection.close();
-  // const pool = await sql.connect(config);
-  // try {
-  //   const data = await pool
-  //     .request()
-  //     .input("id", tiendaId)
-  //     .input("Source", "")
-  //     .input("AperturasTiendas", 0)
-  //     .input("HistorialesCajeros", 0)
-  //     .input("Ventas", 0)
-  //     .input("DevolucionesVentas", 0)
-  //     .input("TicketsRemesas", 0)
-  //     .input("Remesas", 0)
-  //     .input("Pedidos", 0)
-  //     .input("PedidosProveedor", 0)
-  //     .input("Devoluciones", 0)
-  //     .input("Depositos", 0)
-  //     .input("RetirosCaja", 0)
-  //     .input("FacturasAjustesInventarios", 0)
-  //     .input("Ajustes", 0)
-  //     .input("Inventarios", 0)
-  //     .input("Cupones", 0)
-  //     .input("Kardex", 0)
-  //     .input("opcion", 3)
-  //     .input("Result", 0)
-  //     .execute("SQCOM_CountRegistros");
-  //   // console.log(data.recordsets);
-  //   return data;
-  // } catch (err) {
-  //   console.log(err);
-  // }
-  // pool.close();
-};
 module.exports = {
   getTable,
   saveLog,
   getLog,
-  getInfo,
 };

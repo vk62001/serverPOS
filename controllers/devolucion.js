@@ -1,11 +1,11 @@
 const {
   getInfo,
-  axiosInsertData,
-  axiosUpdateData,
+  socketInsertData,
+  socketUpdateData,
 } = require("../utils/axiosfn");
 
 const devolucion = async (req, res) => {
-  const { code, id } = req.body;
+  const { code, id, uuid } = req.body;
   // console.log(code, id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -17,7 +17,7 @@ const devolucion = async (req, res) => {
 
     if (objData.length === 0) return;
     setTimeout(() => {
-      axiosInsertData("Devoluciones", objData[0], id);
+      socketInsertData("Devoluciones", objData[0], id, uuid);
     }, 200);
   }, 1000);
 
@@ -25,7 +25,7 @@ const devolucion = async (req, res) => {
 };
 
 const updateDevolucion = async (req, res) => {
-  const { id } = req.body;
+  const { id, uuid } = req.body;
   // console.log(id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -37,7 +37,7 @@ const updateDevolucion = async (req, res) => {
 
     if (objData.length === 0) return;
     setTimeout(() => {
-      axiosUpdateData("Devoluciones", id, objData[0]);
+      socketUpdateData("Devoluciones", objData[0], id, uuid);
     }, 200);
   }, 1000);
 

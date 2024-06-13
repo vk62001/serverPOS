@@ -1,12 +1,12 @@
 const {
   getInfo,
-  axiosInsertData,
-  axiosUpdateData,
+  socketInsertData,
+  socketUpdateData,
 } = require("../utils/axiosfn");
 const { validaPedido } = require("../utils/utils");
 
 const pedido = async (req, res) => {
-  const { code, id } = req.body;
+  const { code, id, uuid } = req.body;
   // console.log(code, id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -19,7 +19,7 @@ const pedido = async (req, res) => {
 
     if (validaPedido(objData[0])) {
       setTimeout(() => {
-        axiosInsertData("Pedidos", objData[0], id);
+        socketInsertData("Pedidos", objData[0], id, uuid);
       }, 200);
     }
   }, 1000);
@@ -28,22 +28,22 @@ const pedido = async (req, res) => {
 };
 
 const updatePedido = async (req, res) => {
-  console.log("update");
-  const { id } = req.body;
-  console.log(id);
+  // console.log("update");
+  const { id, uuid } = req.body;
+  // console.log(id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
     return;
   }
   setTimeout(async () => {
     const objData = await getInfo("Pedidos", id);
-    console.log(objData, "-");
+    // console.log(objData, "-");
 
     if (objData.length === 0) return;
 
     if (validaPedido(objData[0])) {
       setTimeout(() => {
-        axiosUpdateData("Pedidos", id, objData[0]);
+        socketUpdateData("Pedidos", id, objData[0], uuid);
       }, 200);
     }
   }, 1000);

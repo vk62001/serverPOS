@@ -1,12 +1,12 @@
 const {
   getInfo,
-  axiosInsertData,
-  axiosUpdateData,
+  socketInsertData,
+  socketUpdateData,
 } = require("../utils/axiosfn");
 
 const apertura = async (req, res) => {
   // console.log('post')
-  const { code, id } = req.body;
+  const { code, id, uuid } = req.body;
   // console.log(code, id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -18,7 +18,7 @@ const apertura = async (req, res) => {
 
     if (objData.length === 0) return;
     setTimeout(() => {
-      axiosInsertData("AperturasTiendas", objData[0], id);
+      socketInsertData("AperturasTiendas", objData[0], id, uuid);
     }, 200);
   }, 1000);
 
@@ -27,7 +27,7 @@ const apertura = async (req, res) => {
 
 const updateApertura = async (req, res) => {
   // console.log('put')
-  const { id } = req.body;
+  const { id, uuid } = req.body;
   // console.log(id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -39,7 +39,7 @@ const updateApertura = async (req, res) => {
     // console.log(objData, "- 37");
     if (objData.length === 0) return;
     setTimeout(() => {
-      axiosUpdateData("AperturasTiendas", id, objData[0]);
+      socketUpdateData("AperturasTiendas", id, objData[0], uuid);
     }, 200);
   }, 1000);
 
