@@ -147,10 +147,71 @@ const mappingErrors = async (data) => {
   return numberArray - numberSuccess;
 };
 
+const processesCentralData = async (endPoint, id, obj, method) => {
+  console.log(endPoint, id, method, "Procesando datos");
+
+  const objCallback = {
+    endPoint,
+    id,
+    message: `${method} SUCCESS`,
+    estatus: 1,
+    opc: 1,
+  };
+  try {
+    const { data } =
+      method === "POST"
+        ? await SDKLocal.insertData(endPoint, obj)
+        : await SDKLocal.updateData(endPoint, id);
+    if (typeof data.message === "undefined" || data.message === null) {
+      console.log("Error:", data);
+      objCallback.message = "PUT error ";
+      objCallback.estatus = 0;
+      return objCallback;
+    } else {
+      console.log(`${method} SUCCESS`, endPoint, id, Date());
+      return objCallback;
+    }
+  } catch (error) {
+    let messageError = "";
+    // console.log(error, `${method} axiosError`, Date());
+
+    // console.log(socketTienda[0]);
+    if (error.response) {
+      messageError = error.response.data
+        ? error.response.data.message
+        : error.response.statusText; //.data.message;
+      // El servidor respondió con un código de estado fuera del rango 2xx
+      console.error(
+        "Respuesta de error del servidor:",
+        messageError,
+        Date(),
+        1
+      );
+    } else if (error.request) {
+      messageError = error.request;
+      // La solicitud fue hecha pero no se recibió respuesta
+      console.error(
+        "No se recibió respuesta del servidor:",
+        messageError,
+        Date(),
+        2
+      );
+    } else {
+      messageError = error.message;
+      // Error desconocido
+      console.error("Error desconocido:", messageError, Date(), 3);
+    }
+    // io.to(socketTienda[0].id).emit("callBack", {endPoint, id, message: `${method} ERROR`, estatus: 0, opc: 2, });
+    objCallback.message = `${method} ERROR ${messageError}`;
+    objCallback.estatus = 0;
+    return objCallback;
+  }
+};
 module.exports = {
   getInfo,
   getIdTienda,
   mappingErrors,
   socketInsertData,
   socketUpdateData,
+  processesCentralData,
 };

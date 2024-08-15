@@ -5,7 +5,7 @@ const { getTable, getLog, saveLog } = require("./SQLServer/SQL");
 const apiRouter = require("./routes");
 const { io } = require("socket.io-client");
 const { SDKLocal } = require("./SDK/SDKLocal");
-const { mappingErrors } = require("./utils/axiosfn");
+const { mappingErrors, processesCentralData } = require("./utils/axiosfn");
 const { delay } = require("./utils/utils");
 const axios = require("axios");
 const cron = require("node-cron");
@@ -59,7 +59,7 @@ cron.schedule("*/3 * * * *", () => {
   }
 });
 
-const useSocket = (tiendaId) => {
+const useSocket = (tiendaId, listaPrecios) => {
   const URi = process.env.Uri_sockets;
   console.log(URi);
 
@@ -67,6 +67,7 @@ const useSocket = (tiendaId) => {
     query: {
       tienda: tiendaId,
       room: "kernel",
+      listaPrecios: `${listaPrecios}`,
     },
     reconnectionDelay: 10000, // defaults to 1000
     reconnectionDelayMax: 10000, // defaults to 5000
@@ -131,6 +132,19 @@ const useSocket = (tiendaId) => {
       socket.emit("setExistencias", { data: [] }); //Se envia la informacion a central
     }
   });
+  socket.on("getExistenciasPOSWA", async (e) => {
+    try {
+      const { data } = await SDKLocal.getInfoFilter(
+        "ExistenciasTiendas/ByFilter",
+        e.tienda,
+        e.textUser
+      );
+      socket.emit("setExistenciasWA", { data: data.datas }); //Se envia la informacion a central
+    } catch (err) {
+      console.log(err);
+      socket.emit("setExistenciasWA", { data: [] }); //Se envia la informacion a central
+    }
+  });
   /* 
     solicitud de dataLog manualmente desde Central
   */
@@ -160,6 +174,45 @@ const useSocket = (tiendaId) => {
     saveLog(endPoint, id, message, estatus, opc, uuid);
   });
   socket.emit("test");
+  // socket.on("reconnect", (attemptNumber) => {
+  //   console.log("Reconnected successfully on attempt", attemptNumber);
+  // });
+
+  // socket.on("error", (error) => {
+  //   console.error("Socket.IO error:", error);
+  // });
+
+  // socket.on("connect_error", (error) => {
+  //   console.error("Socket.IO connect error:", error);
+  // });
+
+  socket.on("receiveData", async (objData, resolve) => {
+    console.log("Legga data", objData);
+    const { endPoint, id, message, estatus, opc, uuid, method, data } = objData;
+    // saveLog(endPoint, id, message, estatus, opc, uuid);
+    const response = await processesCentralData(
+      endPoint,
+      id,
+      data,
+      // tienda,
+      method
+    );
+    response.uuid = uuid;
+
+    sendDataToCentral(endPoint, id, uuid, response);
+    // console.log(response, socketTienda[0]?.id);
+    resolve();
+  });
+};
+const sendDataToCentral = async (endPoint, id, uuid, response) => {
+  try {
+    const socket = getSocketInit();
+    socket.emit("callBack", response);
+  } catch (e) {
+    console.error("sendDataToTienda:", endPoint, id, e);
+    const { message, estatus } = response;
+    saveLog(endPoint, id, message, estatus, 0, uuid, tienda);
+  }
 };
 
 const iteracion = async (max = 20, intervalo = 20000) => {
@@ -173,8 +226,8 @@ const iteracion = async (max = 20, intervalo = 20000) => {
           "Content-Type": "application/json",
         },
       });
-      // console.log(data.datas[0].valor, 94);
-      return data.datas[0].valor;
+      console.log(data.datas[0], 94);
+      return data.datas[0];
     } catch (error) {
       console.log("error, iteración no: ", i, error, Date());
       if (error.response) {
@@ -207,10 +260,10 @@ const iteracion = async (max = 20, intervalo = 20000) => {
 // let tiendaId
 const start = async () => {
   iteracion()
-    .then((idTienda) => {
-      console.log(idTienda, "Socket Conectado ", Date());
+    .then(({ valor, usuario_modifica_id: listaPrecios }) => {
+      console.log(valor, listaPrecios, "Socket Conectado ", Date());
       // tiendaId = res;
-      useSocket(idTienda);
+      useSocket(valor, listaPrecios);
     })
     .catch((err) => console.log("no sirve esta mamada", Date()));
 };
