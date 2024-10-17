@@ -35,10 +35,11 @@ const updateVentas = async (req, res) => {
   }
   setTimeout(async () => {
     const objData = await getInfo("Ventas", id);
+    if (objData?.length === 0) return;
     // console.log(objData, "-");
     const objTemp = eliminarPropiedadesVacias(objData[0]);
     setTimeout(() => {
-      socketUpdateData("Ventas", id, objData[0], uuid);
+      socketUpdateData("Ventas", id, objTemp, uuid);
     }, 200);
   }, 1000);
 

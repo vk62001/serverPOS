@@ -17,7 +17,7 @@ const SDKLocal = {
   },
   insertData: function (endPoint, data) {
     const url = `api/v1/${endPoint}/`;
-    console.log("post", url, Date());
+    // console.log("post", url, data, Date());
     return APISQLocal.post(url, data);
   },
   updateData: function (endPoint, id, data) {
@@ -25,8 +25,13 @@ const SDKLocal = {
       endPoint === "ExistenciasTiendas"
         ? `api/v1/${endPoint}/${id}/${data.tienda_Id}/${data.producto_Id}/${data.almacen_Id}`
         : `api/v1/${endPoint}/${id}`;
-    console.log("update", url, Date());
+    // console.log("update", url, id, data, Date(), "updateData");
     return APISQLocal.put(url, data);
+  },
+  deleteData: function (endPoint, data) {
+    const url = `api/v1/${endPoint}/`;
+    // console.log("delete", url, data, Date());
+    return APISQLocal.delete(url, { data: data });
   },
 };
 

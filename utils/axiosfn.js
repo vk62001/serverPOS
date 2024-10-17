@@ -158,10 +158,23 @@ const processesCentralData = async (endPoint, id, obj, method) => {
     opc: 1,
   };
   try {
-    const { data } =
-      method === "POST"
-        ? await SDKLocal.insertData(endPoint, obj)
-        : await SDKLocal.updateData(endPoint, id);
+    let response;
+    switch (method) {
+      case "POST":
+        response = await SDKLocal.insertData(endPoint, obj);
+        break;
+      case "PUT":
+        response = await SDKLocal.updateData(endPoint, id, obj);
+        break;
+      case "DELETE":
+        response = await SDKLocal.deleteData(endPoint, obj);
+        break;
+      default:
+        throw new Error(`Unsupported method: ${method}`);
+    }
+
+    const { data } = response;
+    console.log(data, `respuesta de peticion ${endPoint}/${id}`);
     if (typeof data.message === "undefined" || data.message === null) {
       console.log("Error:", data);
       objCallback.message = "PUT error ";

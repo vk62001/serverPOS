@@ -28,7 +28,7 @@ const pedido = async (req, res) => {
 };
 
 const updatePedido = async (req, res) => {
-  // console.log("update");
+  console.log("update");
   const { id, uuid } = req.body;
   // console.log(id);
   if (id === undefined) {
@@ -37,7 +37,8 @@ const updatePedido = async (req, res) => {
   }
   setTimeout(async () => {
     const objData = await getInfo("Pedidos", id);
-    // console.log(objData, "-");
+    console.log(objData, "-");
+    console.log('aqui')
 
     if (objData.length === 0) return;
 

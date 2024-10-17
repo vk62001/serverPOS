@@ -32,9 +32,42 @@ app.use(express.static("public"));
 app.use("/api/", apiRouter);
 
 app.get("/", async (req, res) => {
-  const query = await getTable("sqt_configuracion");
-  // console.log(query,'--');
-  res.status(200).send({ data: query });
+  const socket = getSocketInit();
+  try {
+    const timeout = 8000; // Tiempo de espera de 8 segundos
+    let timeoutReached = false; // Control para saber si el timeout se alcanzó
+
+    // Configuramos el timeout para manejar el tiempo de espera
+    const timeoutHandle = setTimeout(() => {
+      timeoutReached = true;
+      socket.emit("timeoutReached"); // Notificamos al servidor que el timeout se alcanzó
+      console.log(
+        `Failed to send data to user with socket Tienda - timeout reached`
+      );
+    }, timeout);
+
+    socket
+      .timeout(timeout)
+      .emit("callBack", { message: "test" }, (error, response) => {
+        if (timeoutReached) return; // Si el timeout se alcanzó, no continuamos con el callback
+
+        clearTimeout(timeoutHandle); // Limpiamos el timeout si recibimos respuesta a tiempo
+
+        if (error) {
+          console.log(`Failed to send data to user with socket Tienda `);
+        } else {
+          if (response) {
+            console.log(`${response.message} response`);
+          } else {
+            console.log(`Client failed to process data`);
+          }
+        }
+      });
+
+    const query = await getTable("sqt_configuracion");
+    // console.log(query,'--');
+    res.status(200).send({ data: query });
+  } catch (e) {}
 });
 
 const cronLog = async () => {
@@ -78,7 +111,7 @@ const useSocket = (tiendaId, listaPrecios) => {
   });
 
   socket.on("connect", async () => {
-    console.log("connected", Date());
+    console.log("connected", Date(), socket.id);
     //id de tienda
     //revisar el log y el rollback
     let result = 0;
@@ -187,6 +220,7 @@ const useSocket = (tiendaId, listaPrecios) => {
   // });
 
   socket.on("receiveData", async (objData, resolve) => {
+    console.log(socket.id, "socket id ");
     console.log("Legga data", objData);
     const { endPoint, id, message, estatus, opc, uuid, method, data } = objData;
     // saveLog(endPoint, id, message, estatus, opc, uuid);
@@ -199,9 +233,12 @@ const useSocket = (tiendaId, listaPrecios) => {
     );
     response.uuid = uuid;
 
-    sendDataToCentral(endPoint, id, uuid, response);
+    // sendDataToCentral(endPoint, id, uuid, response);
     // console.log(response, socketTienda[0]?.id);
-    resolve();
+    setTimeout(() => {
+      console.log("resuelto", response);
+      resolve(response);
+    }, 5000);
   });
 };
 const sendDataToCentral = async (endPoint, id, uuid, response) => {
