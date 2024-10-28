@@ -109,12 +109,15 @@ const useSocket = (tiendaId, listaPrecios) => {
       room: "kernel",
       listaPrecios: `${listaPrecios}`,
     },
-    reconnectionDelay: 60000, // defaults to 1000
-    reconnectionDelayMax: 60000, // defaults to 5000
+    reconnection: true, // Habilita la reconexión automática
+    reconnectionAttempts: Infinity, // Número máximo de intentos de reconexión
+    reconnectionDelay: 10000, // defaults to 1000
+    reconnectionDelayMax: 30000, // defaults to 5000
     transports: ["websocket"],
     upgrade: false,
     pingInterval: 10000, // how often to ping/pong.
     pingTimeout: 60000, // how long until the ping times out.
+    randomizationFactor: 0.5, // Factor de aleatoriedad para el tiempo de reconexión
   });
 
   socket.on("connect", async () => {
@@ -204,8 +207,8 @@ const useSocket = (tiendaId, listaPrecios) => {
     socket.emit("setCountRegistros", { registros: data.data, e: e.e }); //Se envia la informacion a central
   });
 
-  socket.on("disconnect", (reason, details) => {
-    console.table(reason);
+  socket.on("disconnect", async (reason, details) => {
+    console.log(reason, socket.connected);
     console.table(details);
     flagLog = false;
   });
