@@ -1,11 +1,11 @@
 const {
   getInfo,
-  axiosInsertData,
-  axiosUpdateData,
+  socketInsertData,
+  socketUpdateData,
 } = require("../utils/axiosfn");
 
 const facturasAjusteInventario = async (req, res) => {
-  const { code, id } = req.body;
+  const { code, id, uuid } = req.body;
   // console.log(code, id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -14,10 +14,9 @@ const facturasAjusteInventario = async (req, res) => {
   setTimeout(async () => {
     const objData = await getInfo("FacturasAjustesInventarios", id);
     // console.log(objData, "-");
-    if(objData.length===0)
-      return;
+    if (objData.length === 0) return;
     setTimeout(() => {
-      axiosInsertData("FacturasAjustesInventarios", objData[0], id);
+      socketInsertData("FacturasAjustesInventarios", objData[0], id, uuid);
     }, 200);
   }, 1000);
 
@@ -25,7 +24,7 @@ const facturasAjusteInventario = async (req, res) => {
 };
 
 const updateFacturasAjusteInventario = async (req, res) => {
-  const { id } = req.body;
+  const { id, uuid } = req.body;
   // console.log(id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -34,10 +33,9 @@ const updateFacturasAjusteInventario = async (req, res) => {
   setTimeout(async () => {
     const objData = await getInfo("FacturasAjustesInventarios", id);
     // console.log(objData, "-");
-    if(objData.length===0)
-      return;
+    if (objData.length === 0) return;
     setTimeout(() => {
-      axiosUpdateData("FacturasAjustesInventarios", id, objData[0]);
+      socketUpdateData("FacturasAjustesInventarios", id, objData[0], uuid);
     }, 200);
   }, 1000);
 

@@ -1,12 +1,12 @@
 const {
   getInfo,
-  axiosInsertData,
-  axiosUpdateData,
+  socketInsertData,
+  socketUpdateData,
 } = require("../utils/axiosfn");
 
 const deposito = async (req, res) => {
   // console.log('post')
-  const { code, id } = req.body;
+  const { code, id, uuid } = req.body;
   // console.log(code, id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -16,10 +16,9 @@ const deposito = async (req, res) => {
     const objData = await getInfo("Depositos", id);
     // console.log(objData, "-", 16);
 
-    if(objData.length===0)
-      return;
+    if (objData.length === 0) return;
     setTimeout(() => {
-      axiosInsertData("Depositos", objData[0], id);
+      socketInsertData("Depositos", objData[0], id, uuid);
     }, 200);
   }, 1000);
 
@@ -28,7 +27,7 @@ const deposito = async (req, res) => {
 
 const updateDeposito = async (req, res) => {
   // console.log('put')
-  const { id } = req.body;
+  const { id, uuid } = req.body;
   // console.log(id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -36,12 +35,11 @@ const updateDeposito = async (req, res) => {
   }
   setTimeout(async () => {
     const objData = await getInfo("Depositos", id);
-    
+
     // console.log(objData, "- 37");
-     if(objData.length===0)
-      return;
+    if (objData.length === 0) return;
     setTimeout(() => {
-      axiosUpdateData("Depositos", id, objData[0]);
+      socketUpdateData("Depositos", id, objData[0], uuid);
     }, 200);
   }, 1000);
 

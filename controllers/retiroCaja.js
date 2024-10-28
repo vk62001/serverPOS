@@ -1,11 +1,11 @@
 const {
   getInfo,
-  axiosInsertData,
-  axiosUpdateData,
+  socketInsertData,
+  socketUpdateData,
 } = require("../utils/axiosfn");
 
 const retiroCaja = async (req, res) => {
-  const { code, id } = req.body;
+  const { code, id, uuid } = req.body;
   // console.log(code, id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -16,7 +16,7 @@ const retiroCaja = async (req, res) => {
     // console.log(objData, "-");
 
     setTimeout(() => {
-      axiosInsertData("RetirosCaja", objData[0], id);
+      socketInsertData("RetirosCaja", objData[0], id, uuid);
     }, 200);
   }, 1000);
 
@@ -24,7 +24,7 @@ const retiroCaja = async (req, res) => {
 };
 
 const updateRetiroCaja = async (req, res) => {
-  const { id } = req.body;
+  const { id, uuid } = req.body;
   // console.log(id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -35,7 +35,7 @@ const updateRetiroCaja = async (req, res) => {
     // console.log(objData, "-", id);
 
     setTimeout(() => {
-      axiosUpdateData("RetirosCaja", id, objData[0]);
+      socketUpdateData("RetirosCaja", id, objData[0], uuid);
     }, 200);
   }, 1000);
 

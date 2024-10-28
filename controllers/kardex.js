@@ -1,11 +1,11 @@
 const {
   getInfo,
-  axiosInsertData,
-  axiosUpdateData,
+  socketInsertData,
+  socketUpdateData,
 } = require("../utils/axiosfn");
 
 const kardex = async (req, res) => {
-  const { code, id } = req.body;
+  const { code, id, uuid } = req.body;
   // console.log(code, id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -15,10 +15,9 @@ const kardex = async (req, res) => {
     const objData = await getInfo("Kardex", id);
     // console.log(objData, "-");
 
-    if(objData.length===0)
-      return;
+    if (objData.length === 0) return;
     setTimeout(() => {
-      axiosInsertData("Kardex", objData[0], id);
+      socketInsertData("Kardex", objData[0], id, uuid);
     }, 200);
   }, 1000);
 
@@ -26,7 +25,7 @@ const kardex = async (req, res) => {
 };
 
 const updateKardex = async (req, res) => {
-  const { id } = req.body;
+  const { id, uuid } = req.body;
   // console.log(id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -36,10 +35,9 @@ const updateKardex = async (req, res) => {
     const objData = await getInfo("Kardex", id);
     // console.log(objData, "-");
 
-    if(objData.length===0)
-      return;
+    if (objData.length === 0) return;
     setTimeout(() => {
-      axiosUpdateData("Kardex", id, objData[0]);
+      socketUpdateData("Kardex", id, objData[0], uuid);
     }, 200);
   }, 1000);
 

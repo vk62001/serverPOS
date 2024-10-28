@@ -1,12 +1,12 @@
 const {
   getInfo,
-  axiosInsertData,
-  axiosUpdateData,
+  socketInsertData,
+  socketUpdateData,
 } = require("../utils/axiosfn");
 
 const inventario = async (req, res) => {
   // console.log("post");
-  const { code, id } = req.body;
+  const { code, id, uuid } = req.body;
   // console.log(code, id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -18,7 +18,7 @@ const inventario = async (req, res) => {
 
     if (objData.length === 0) return;
     setTimeout(() => {
-      axiosInsertData("Inventarios", objData[0], id);
+      socketInsertData("Inventarios", objData[0], id, uuid);
     }, 200);
   }, 1000);
 
@@ -27,7 +27,7 @@ const inventario = async (req, res) => {
 
 const updateInventario = async (req, res) => {
   // console.log("put");
-  const { id } = req.body;
+  const { id, uuid } = req.body;
   // console.log(id);
   if (id === undefined) {
     res.status(200).send({ ok: true });
@@ -39,7 +39,7 @@ const updateInventario = async (req, res) => {
     // console.log(objData, "- 37");
     if (objData.length === 0) return;
     setTimeout(() => {
-      axiosUpdateData("Inventarios", id, objData[0]);
+      socketUpdateData("Inventarios", id, objData[0], uuid);
     }, 200);
   }, 1000);
 
