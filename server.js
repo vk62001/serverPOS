@@ -32,42 +32,49 @@ app.use(express.static("public"));
 app.use("/api/", apiRouter);
 
 app.get("/", async (req, res) => {
-  const socket = getSocketInit();
-  try {
-    const timeout = 8000; // Tiempo de espera de 8 segundos
-    let timeoutReached = false; // Control para saber si el timeout se alcanzó
+  // const socket = getSocketInit();
+  // try {
+  //   const timeout = 8000; // Tiempo de espera de 8 segundos
+  //   let timeoutReached = false; // Control para saber si el timeout se alcanzó
 
-    // Configuramos el timeout para manejar el tiempo de espera
-    const timeoutHandle = setTimeout(() => {
-      timeoutReached = true;
-      socket.emit("timeoutReached"); // Notificamos al servidor que el timeout se alcanzó
-      console.log(
-        `Failed to send data to user with socket Tienda - timeout reached`
-      );
-    }, timeout);
+  //   // Configuramos el timeout para manejar el tiempo de espera
+  //   const timeoutHandle = setTimeout(() => {
+  //     timeoutReached = true;
+  //     socket.emit("timeoutReached"); // Notificamos al servidor que el timeout se alcanzó
+  //     console.log(
+  //       `Failed to send data to user with socket Tienda - timeout reached`
+  //     );
+  //   }, timeout);
 
-    socket
-      .timeout(timeout)
-      .emit("callBack", { message: "test" }, (error, response) => {
-        if (timeoutReached) return; // Si el timeout se alcanzó, no continuamos con el callback
+  //   socket
+  //     .timeout(timeout)
+  //     .emit("callBack", { message: "test" }, (error, response) => {
+  //       if (timeoutReached) return; // Si el timeout se alcanzó, no continuamos con el callback
 
-        clearTimeout(timeoutHandle); // Limpiamos el timeout si recibimos respuesta a tiempo
+  //       clearTimeout(timeoutHandle); // Limpiamos el timeout si recibimos respuesta a tiempo
 
-        if (error) {
-          console.log(`Failed to send data to user with socket Tienda `);
-        } else {
-          if (response) {
-            console.log(`${response.message} response`);
-          } else {
-            console.log(`Client failed to process data`);
-          }
-        }
-      });
+  //       if (error) {
+  //         console.log(`Failed to send data to user with socket Tienda `);
+  //       } else {
+  //         if (response) {
+  //           console.log(`${response.message} response`);
+  //         } else {
+  //           console.log(`Client failed to process data`);
+  //         }
+  //       }
+  //     });
 
-    const query = await getTable("sqt_configuracion");
-    // console.log(query,'--');
-    res.status(200).send({ data: query });
-  } catch (e) {}
+  //   } catch (e) {}
+
+  var { version } = require("./package.json");
+  console.log(version);
+
+  const query = await getTable("sqt_configuracion");
+  const valueConf = query.recordset.filter((item) => item.clave === "NOTIENDA");
+
+  res
+    .status(200)
+    .send({ Tienda: valueConf[0].valor, "Version del Servicio": version });
 });
 
 const cronLog = async () => {
@@ -102,8 +109,8 @@ const useSocket = (tiendaId, listaPrecios) => {
       room: "kernel",
       listaPrecios: `${listaPrecios}`,
     },
-    reconnectionDelay: 10000, // defaults to 1000
-    reconnectionDelayMax: 10000, // defaults to 5000
+    reconnectionDelay: 60000, // defaults to 1000
+    reconnectionDelayMax: 60000, // defaults to 5000
     transports: ["websocket"],
     upgrade: false,
     pingInterval: 10000, // how often to ping/pong.
@@ -117,6 +124,7 @@ const useSocket = (tiendaId, listaPrecios) => {
     let result = 0;
     // // do {
     const getDataLog = await getLog();
+    if (!getDataLog) return;
     result = await mappingErrors(getDataLog.recordset);
     // console.table(getDataLog.recordset);
     console.log(
@@ -183,6 +191,7 @@ const useSocket = (tiendaId, listaPrecios) => {
   */
   socket.on("getDataLogManually", async (e) => {
     const getDataLog = await getLog(true);
+    if (!getDataLog) return;
     const result = await mappingErrors(getDataLog.recordset);
     // console.table(getDataLog.recordset);
     console.log(result, "fin del log");
@@ -201,7 +210,10 @@ const useSocket = (tiendaId, listaPrecios) => {
     flagLog = false;
   });
 
-  socket.on("callBack", (data) => {
+  socket.on("callBack", async (data) => {
+    await delay(100);
+    // const decompressedData = zlib.gunzipSync(data).toString();
+    // const dataTemp = JSON.parse(decompressedData);
     // console.log("regrso bien!", data);
     const { endPoint, id, message, estatus, opc, uuid } = data;
     saveLog(endPoint, id, message, estatus, opc, uuid);

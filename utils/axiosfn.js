@@ -125,7 +125,8 @@ const mappingErrors = async (data) => {
       // console.log(objData, "91 - processElement", Date());
       await new Promise(async (resolve) => {
         // console.log(socket.id);
-        await socket.emit("sendData", objData, resolve);
+        await delay(500);
+        socket.emit("sendData", objData, resolve);
         numberSuccess++;
       });
     } catch (error) {
