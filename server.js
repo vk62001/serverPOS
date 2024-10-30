@@ -111,12 +111,12 @@ const useSocket = (tiendaId, listaPrecios) => {
     },
     reconnection: true, // Habilita la reconexión automática
     reconnectionAttempts: Infinity, // Número máximo de intentos de reconexión
-    reconnectionDelay: 10000, // defaults to 1000
-    reconnectionDelayMax: 30000, // defaults to 5000
+    // reconnectionDelay: 10000, // defaults to 1000
+    // reconnectionDelayMax: 30000, // defaults to 5000
     transports: ["websocket"],
     upgrade: false,
     pingInterval: 10000, // how often to ping/pong.
-    pingTimeout: 60000, // how long until the ping times out.
+    pingTimeout: 30000, // how long until the ping times out.
     randomizationFactor: 0.5, // Factor de aleatoriedad para el tiempo de reconexión
   });
 
@@ -140,6 +140,9 @@ const useSocket = (tiendaId, listaPrecios) => {
 
   setSocketInit(socket);
 
+  socket.on("connect_error", (err) => {
+    console.error(`connect_error due to ${err.message}`);
+  });
   socket.on("reconnection_attempt", async () => {
     let result = 0;
     // do {
