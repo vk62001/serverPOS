@@ -85,13 +85,8 @@ const useSocket = (tiendaId, listaPrecios) => {
     },
     reconnection: true, // Habilita la reconexión automática
     reconnectionAttempts: Infinity, // Número máximo de intentos de reconexión
-<<<<<<< HEAD
     reconnectionDelay: 1000, // defaults to 1000
     reconnectionDelayMax: 5000, // defaults to 5000
-=======
-    // reconnectionDelay: 10000, // defaults to 1000
-    // reconnectionDelayMax: 30000, // defaults to 5000
->>>>>>> ef4104228da8f42e5bc65ad9989d0c0a77677e78
     transports: ["websocket"],
     upgrade: false,
     pingInterval: 10000, // how often to ping/pong.
