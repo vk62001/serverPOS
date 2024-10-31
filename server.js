@@ -141,7 +141,7 @@ const useSocket = (tiendaId, listaPrecios) => {
   setSocketInit(socket);
 
   socket.on("connect_error", (err) => {
-    console.error(`connect_error due to ${err.message}`);
+    console.error(`connect_error due to ${err.message}`, Date());
   });
   socket.on("reconnection_attempt", async () => {
     let result = 0;
