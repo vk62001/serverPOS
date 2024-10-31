@@ -66,8 +66,8 @@ cron.schedule("*/3 * * * *", () => {
 });
 
 // Configura el cron job para que se ejecute cada 2 minutos
-cron.schedule("*/s * * * *", () => {
-  if (!socket.connected) {
+cron.schedule("*/2 * * * *", () => {
+  if (!socket?.connected) {
     socket.close();
     start();
   }
