@@ -32,40 +32,6 @@ app.use(express.static("public"));
 app.use("/api/", apiRouter);
 
 app.get("/", async (req, res) => {
-  // const socket = getSocketInit();
-  // try {
-  //   const timeout = 8000; // Tiempo de espera de 8 segundos
-  //   let timeoutReached = false; // Control para saber si el timeout se alcanzó
-
-  //   // Configuramos el timeout para manejar el tiempo de espera
-  //   const timeoutHandle = setTimeout(() => {
-  //     timeoutReached = true;
-  //     socket.emit("timeoutReached"); // Notificamos al servidor que el timeout se alcanzó
-  //     console.log(
-  //       `Failed to send data to user with socket Tienda - timeout reached`
-  //     );
-  //   }, timeout);
-
-  //   socket
-  //     .timeout(timeout)
-  //     .emit("callBack", { message: "test" }, (error, response) => {
-  //       if (timeoutReached) return; // Si el timeout se alcanzó, no continuamos con el callback
-
-  //       clearTimeout(timeoutHandle); // Limpiamos el timeout si recibimos respuesta a tiempo
-
-  //       if (error) {
-  //         console.log(`Failed to send data to user with socket Tienda `);
-  //       } else {
-  //         if (response) {
-  //           console.log(`${response.message} response`);
-  //         } else {
-  //           console.log(`Client failed to process data`);
-  //         }
-  //       }
-  //     });
-
-  //   } catch (e) {}
-
   var { version } = require("./package.json");
   console.log(version);
 
@@ -99,6 +65,14 @@ cron.schedule("*/3 * * * *", () => {
   }
 });
 
+// Configura el cron job para que se ejecute cada 2 minutos
+cron.schedule("*/s * * * *", () => {
+  if (!socket.connected) {
+    socket.close();
+    start();
+  }
+});
+
 const useSocket = (tiendaId, listaPrecios) => {
   const URi = process.env.Uri_sockets;
   console.log(URi);
@@ -111,12 +85,12 @@ const useSocket = (tiendaId, listaPrecios) => {
     },
     reconnection: true, // Habilita la reconexión automática
     reconnectionAttempts: Infinity, // Número máximo de intentos de reconexión
-    reconnectionDelay: 10000, // defaults to 1000
-    reconnectionDelayMax: 30000, // defaults to 5000
+    reconnectionDelay: 1000, // defaults to 1000
+    reconnectionDelayMax: 5000, // defaults to 5000
     transports: ["websocket"],
     upgrade: false,
     pingInterval: 10000, // how often to ping/pong.
-    pingTimeout: 60000, // how long until the ping times out.
+    pingTimeout: 30000, // how long until the ping times out.
     randomizationFactor: 0.5, // Factor de aleatoriedad para el tiempo de reconexión
   });
 
@@ -211,6 +185,11 @@ const useSocket = (tiendaId, listaPrecios) => {
     console.log(reason, socket.connected);
     console.table(details);
     flagLog = false;
+  });
+
+
+  socket.on("connect_error", (err) => {
+    console.error(`connect_error due to ${err.message}`);
   });
 
   socket.on("callBack", async (data) => {
