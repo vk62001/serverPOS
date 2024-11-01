@@ -13,7 +13,7 @@ const { getSocketInit, setSocketInit } = require("./utils/globalVars");
 
 let socket;
 let flagLog = false;
-let tienda
+let tienda;
 // App setup
 const PORT = 5001;
 const app = express();
@@ -67,23 +67,26 @@ cron.schedule("*/3 * * * *", () => {
 });
 
 // Configura el cron job para que se ejecute cada 2 minutos
-cron.schedule("*/2 * * * *", () => {
-
-try{
-  const {data} = axios.get(`${process.env.uri_ServerCentral}/getTiendaRedis/${tienda}`);
-//ver si la tienda existe en redis
-//socket id == socket server? socket.connected
-  
-  if (data.length === 0 || !socket.connected  || socket.id!== data.id) {
-
-    //revisar que la tienda no esté o esté en redis, //get por segundo nos da 2kps de resquest y 10kbps de response
-    socket.close();
-    start();
+cron.schedule("*/2 * * * *", async () => {
+  try {
+    const { data } = await axios.get(
+      `${process.env.uri_ServerCentral}/getTiendaRedis/${tienda}`
+    );
+    //ver si la tienda existe en redis
+    //socket id == socket server? socket.connected
+    if (
+      data.data.length === 0 ||
+      !socket.connected ||
+      socket.id !== data.data[0].id
+    ) {
+      console.log("La tienda no existe en redis se forzara la reconexion");
+      //revisar que la tienda no esté o esté en redis, //get por segundo nos da 2kps de resquest y 10kbps de response
+      socket.close();
+      start();
+    }
+  } catch (e) {
+    console.error(e.message, "error de cron reconexión"); // error de internet,
   }
-}catch(e){
-  console.error(e.message,"error de cron reconexión" ); // error de internet, 
-}
-
 });
 
 const useSocket = async (tiendaId, listaPrecios) => {
@@ -275,9 +278,9 @@ const iteracion = (max = 20, intervalo = 20000) => {
         });
         console.log(data.datas[0], 94);
         resolve(data.datas[0]);
-        break
+        break;
       } catch (error) {
-        console.log("error, iteración no: ", i,  Date());
+        console.log("error, iteración no: ", i, Date());
         if (error.response) {
           if (error.response.data.message) {
             console.log(
