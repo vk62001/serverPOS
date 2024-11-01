@@ -13,6 +13,7 @@ const { getSocketInit, setSocketInit } = require("./utils/globalVars");
 
 let socket;
 let flagLog = false;
+let tienda
 // App setup
 const PORT = 5001;
 const app = express();
@@ -32,40 +33,6 @@ app.use(express.static("public"));
 app.use("/api/", apiRouter);
 
 app.get("/", async (req, res) => {
-  // const socket = getSocketInit();
-  // try {
-  //   const timeout = 8000; // Tiempo de espera de 8 segundos
-  //   let timeoutReached = false; // Control para saber si el timeout se alcanzó
-
-  //   // Configuramos el timeout para manejar el tiempo de espera
-  //   const timeoutHandle = setTimeout(() => {
-  //     timeoutReached = true;
-  //     socket.emit("timeoutReached"); // Notificamos al servidor que el timeout se alcanzó
-  //     console.log(
-  //       `Failed to send data to user with socket Tienda - timeout reached`
-  //     );
-  //   }, timeout);
-
-  //   socket
-  //     .timeout(timeout)
-  //     .emit("callBack", { message: "test" }, (error, response) => {
-  //       if (timeoutReached) return; // Si el timeout se alcanzó, no continuamos con el callback
-
-  //       clearTimeout(timeoutHandle); // Limpiamos el timeout si recibimos respuesta a tiempo
-
-  //       if (error) {
-  //         console.log(`Failed to send data to user with socket Tienda `);
-  //       } else {
-  //         if (response) {
-  //           console.log(`${response.message} response`);
-  //         } else {
-  //           console.log(`Client failed to process data`);
-  //         }
-  //       }
-  //     });
-
-  //   } catch (e) {}
-
   var { version } = require("./package.json");
   console.log(version);
 
@@ -99,10 +66,30 @@ cron.schedule("*/3 * * * *", () => {
   }
 });
 
-const useSocket = (tiendaId, listaPrecios) => {
+// Configura el cron job para que se ejecute cada 2 minutos
+cron.schedule("*/2 * * * *", () => {
+
+try{
+  const {data} = axios.get(`${process.env.uri_ServerCentral}/getTiendaRedis/${tienda}`);
+//ver si la tienda existe en redis
+//socket id == socket server? socket.connected
+  
+  if (data.length === 0 || !socket.connected  || socket.id!== data.id) {
+
+    //revisar que la tienda no esté o esté en redis, //get por segundo nos da 2kps de resquest y 10kbps de response
+    socket.close();
+    start();
+  }
+}catch(e){
+  console.error(e.message,"error de cron reconexión" ); // error de internet, 
+}
+
+});
+
+const useSocket = async (tiendaId, listaPrecios) => {
   const URi = process.env.Uri_sockets;
   console.log(URi);
-
+  tienda = tiendaId;
   socket = io.connect(URi, {
     query: {
       tienda: tiendaId,
@@ -111,8 +98,8 @@ const useSocket = (tiendaId, listaPrecios) => {
     },
     reconnection: true, // Habilita la reconexión automática
     reconnectionAttempts: Infinity, // Número máximo de intentos de reconexión
-    // reconnectionDelay: 10000, // defaults to 1000
-    // reconnectionDelayMax: 30000, // defaults to 5000
+    reconnectionDelay: 1000, // defaults to 1000
+    reconnectionDelayMax: 5000, // defaults to 5000
     transports: ["websocket"],
     upgrade: false,
     pingInterval: 10000, // how often to ping/pong.
@@ -141,7 +128,7 @@ const useSocket = (tiendaId, listaPrecios) => {
   setSocketInit(socket);
 
   socket.on("connect_error", (err) => {
-    console.error(`connect_error due to ${err.message}`, Date());
+    console.error(`connect_error due to ${err.message}`);
   });
   socket.on("reconnection_attempt", async () => {
     let result = 0;
@@ -216,6 +203,10 @@ const useSocket = (tiendaId, listaPrecios) => {
     flagLog = false;
   });
 
+  socket.on("connect_error", (err) => {
+    console.error(`connect_error due to ${err.message}`);
+  });
+
   socket.on("callBack", async (data) => {
     await delay(100);
     // const decompressedData = zlib.gunzipSync(data).toString();
@@ -270,47 +261,50 @@ const sendDataToCentral = async (endPoint, id, uuid, response) => {
   }
 };
 
-const iteracion = async (max = 20, intervalo = 20000) => {
+const iteracion = (max = 20, intervalo = 20000) => {
   const url = `${process.env.URi_local}api/v1/Configuraciones`;
   console.log(url, "85 -- Iterando ", Date());
-  for (let i = 0; i < max; i++) {
-    try {
-      const { data } = await axios.get(url, {
-        headers: {
-          Authorization: `Basic ${process.env.credentials}`,
-          "Content-Type": "application/json",
-        },
-      });
-      console.log(data.datas[0], 94);
-      return data.datas[0];
-    } catch (error) {
-      console.log("error, iteración no: ", i, error, Date());
-      if (error.response) {
-        if (error.response.data.message) {
-          console.log(
-            error.response.data.message,
-            "error.response.data.message"
-          );
+  return new Promise(async (resolve, reject) => {
+    for (let i = 0; i < max; i++) {
+      try {
+        const { data } = await axios.get(url, {
+          headers: {
+            Authorization: `Basic ${process.env.credentials}`,
+            "Content-Type": "application/json",
+          },
+        });
+        console.log(data.datas[0], 94);
+        resolve(data.datas[0]);
+        break
+      } catch (error) {
+        console.log("error, iteración no: ", i,  Date());
+        if (error.response) {
+          if (error.response.data.message) {
+            console.log(
+              error.response.data.message,
+              "error.response.data.message"
+            );
+          } else {
+            // El servidor respondió con un código de estado fuera del rango 2xx
+            console.error(
+              "Respuesta de error del servidor:",
+              error.response.status,
+              error.response.statusText
+            );
+          }
+        } else if (error.request) {
+          // La solicitud fue hecha pero no se recibió respuesta
+          console.error("No se recibió respuesta del servidor:", error.message);
         } else {
-          // El servidor respondió con un código de estado fuera del rango 2xx
-          console.error(
-            "Respuesta de error del servidor:",
-            error.response.status,
-            error.response.statusText
-          );
+          // Error desconocido
+          console.error("Error desconocido:", error.message);
         }
-      } else if (error.request) {
-        // La solicitud fue hecha pero no se recibió respuesta
-        console.error("No se recibió respuesta del servidor:", error.message);
-      } else {
-        // Error desconocido
-        console.error("Error desconocido:", error.message);
+        await delay(intervalo);
+        flagLog = false;
       }
-      await delay(intervalo);
-      flagLog = false;
     }
-  }
-  throw new Error("No sirve esta chingadera");
+    reject({ message: "No sirve esta mamada chingo su madre" });
+  });
 };
 // let tiendaId
 const start = async () => {
