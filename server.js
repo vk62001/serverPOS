@@ -86,7 +86,7 @@ try{
 
 });
 
-const useSocket = (tiendaId, listaPrecios) => {
+const useSocket = async (tiendaId, listaPrecios) => {
   const URi = process.env.Uri_sockets;
   console.log(URi);
   tienda = tiendaId;
@@ -203,7 +203,6 @@ const useSocket = (tiendaId, listaPrecios) => {
     flagLog = false;
   });
 
-
   socket.on("connect_error", (err) => {
     console.error(`connect_error due to ${err.message}`);
   });
@@ -262,47 +261,50 @@ const sendDataToCentral = async (endPoint, id, uuid, response) => {
   }
 };
 
-const iteracion = async (max = 20, intervalo = 20000) => {
+const iteracion = (max = 20, intervalo = 20000) => {
   const url = `${process.env.URi_local}api/v1/Configuraciones`;
   console.log(url, "85 -- Iterando ", Date());
-  for (let i = 0; i < max; i++) {
-    try {
-      const { data } = await axios.get(url, {
-        headers: {
-          Authorization: `Basic ${process.env.credentials}`,
-          "Content-Type": "application/json",
-        },
-      });
-      console.log(data.datas[0], 94);
-      return data.datas[0];
-    } catch (error) {
-      console.log("error, iteración no: ", i, error, Date());
-      if (error.response) {
-        if (error.response.data.message) {
-          console.log(
-            error.response.data.message,
-            "error.response.data.message"
-          );
+  return new Promise(async (resolve, reject) => {
+    for (let i = 0; i < max; i++) {
+      try {
+        const { data } = await axios.get(url, {
+          headers: {
+            Authorization: `Basic ${process.env.credentials}`,
+            "Content-Type": "application/json",
+          },
+        });
+        console.log(data.datas[0], 94);
+        resolve(data.datas[0]);
+        break
+      } catch (error) {
+        console.log("error, iteración no: ", i,  Date());
+        if (error.response) {
+          if (error.response.data.message) {
+            console.log(
+              error.response.data.message,
+              "error.response.data.message"
+            );
+          } else {
+            // El servidor respondió con un código de estado fuera del rango 2xx
+            console.error(
+              "Respuesta de error del servidor:",
+              error.response.status,
+              error.response.statusText
+            );
+          }
+        } else if (error.request) {
+          // La solicitud fue hecha pero no se recibió respuesta
+          console.error("No se recibió respuesta del servidor:", error.message);
         } else {
-          // El servidor respondió con un código de estado fuera del rango 2xx
-          console.error(
-            "Respuesta de error del servidor:",
-            error.response.status,
-            error.response.statusText
-          );
+          // Error desconocido
+          console.error("Error desconocido:", error.message);
         }
-      } else if (error.request) {
-        // La solicitud fue hecha pero no se recibió respuesta
-        console.error("No se recibió respuesta del servidor:", error.message);
-      } else {
-        // Error desconocido
-        console.error("Error desconocido:", error.message);
+        await delay(intervalo);
+        flagLog = false;
       }
-      await delay(intervalo);
-      flagLog = false;
     }
-  }
-  throw new Error("No sirve esta chingadera");
+    reject({ message: "No sirve esta mamada chingo su madre" });
+  });
 };
 // let tiendaId
 const start = async () => {
