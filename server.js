@@ -13,6 +13,7 @@ const { getSocketInit, setSocketInit } = require("./utils/globalVars");
 
 let socket;
 let flagLog = false;
+let tienda
 // App setup
 const PORT = 5001;
 const app = express();
@@ -67,16 +68,28 @@ cron.schedule("*/3 * * * *", () => {
 
 // Configura el cron job para que se ejecute cada 2 minutos
 cron.schedule("*/2 * * * *", () => {
-  if (!socket?.connected) {
+
+try{
+  const {data} = axios.get(`${process.env.uri_ServerCentral}/getTiendaRedis/${tienda}`);
+//ver si la tienda existe en redis
+//socket id == socket server? socket.connected
+  
+  if (data.length === 0 || !socket.connected  || socket.id!== data.id) {
+
+    //revisar que la tienda no esté o esté en redis, //get por segundo nos da 2kps de resquest y 10kbps de response
     socket.close();
     start();
   }
+}catch(e){
+  console.error(e.message,"error de cron reconexión" ); // error de internet, 
+}
+
 });
 
 const useSocket = (tiendaId, listaPrecios) => {
   const URi = process.env.Uri_sockets;
   console.log(URi);
-
+  tienda = tiendaId;
   socket = io.connect(URi, {
     query: {
       tienda: tiendaId,
@@ -115,7 +128,7 @@ const useSocket = (tiendaId, listaPrecios) => {
   setSocketInit(socket);
 
   socket.on("connect_error", (err) => {
-    console.error(`connect_error due to ${err.message}`, Date());
+    console.error(`connect_error due to ${err.message}`);
   });
   socket.on("reconnection_attempt", async () => {
     let result = 0;
