@@ -11,6 +11,8 @@ const axios = require("axios");
 const cron = require("node-cron");
 const { getSocketInit, setSocketInit } = require("./utils/globalVars");
 
+const { version } = require("./package.json");
+
 let socket;
 let flagLog = false;
 let tienda;
@@ -33,8 +35,6 @@ app.use(express.static("public"));
 app.use("/api/", apiRouter);
 
 app.get("/", async (req, res) => {
-  var { version } = require("./package.json");
-  console.log(version);
 
   const query = await getTable("sqt_configuracion");
   const valueConf = query.recordset.filter((item) => item.clave === "NOTIENDA");
@@ -98,6 +98,7 @@ const useSocket = async (tiendaId, listaPrecios) => {
       tienda: tiendaId,
       room: "kernel",
       listaPrecios: `${listaPrecios}`,
+      version
     },
     reconnection: true, // Habilita la reconexión automática
     reconnectionAttempts: Infinity, // Número máximo de intentos de reconexión
