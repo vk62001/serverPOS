@@ -130,9 +130,6 @@ const useSocket = async (tiendaId, listaPrecios) => {
 
   setSocketInit(socket);
 
-  socket.on("connect_error", (err) => {
-    console.error(`connect_error due to ${err.message}`);
-  });
   socket.on("reconnection_attempt", async () => {
     let result = 0;
     // do {
