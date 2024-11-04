@@ -98,7 +98,8 @@ const useSocket = async (tiendaId, listaPrecios) => {
       tienda: tiendaId,
       room: "kernel",
       listaPrecios: `${listaPrecios}`,
-      version
+      version,
+      pos: true,
     },
     reconnection: true, // Habilita la reconexión automática
     reconnectionAttempts: Infinity, // Número máximo de intentos de reconexión
