@@ -85,7 +85,7 @@ cron.schedule("*/2 * * * *", async () => {
       start();
     }
   } catch (e) {
-    console.error(e.message, "error de cron reconexión"); // error de internet,
+    console.error(e.message, "error de cron reconexión", Date()); // error de internet,
   }
 });
 
@@ -201,10 +201,6 @@ const useSocket = async (tiendaId, listaPrecios) => {
     console.log(reason, socket.connected);
     console.table(details);
     flagLog = false;
-  });
-
-  socket.on("connect_error", (err) => {
-    console.error(`connect_error due to ${err.message}`);
   });
 
   socket.on("callBack", async (data) => {
