@@ -4,12 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start-react": "node src/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-react": "^7.25.9",
+    "@babel/register": "^7.25.9",
     "axios": "^1.3.3",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
@@ -19,6 +24,8 @@
     "mssql": "^11.0.1",
     "node-cron": "^3.0.3",
     "node-windows": "^1.0.0-beta.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "socket.io-client": "^4.8.1"
   }
 }
