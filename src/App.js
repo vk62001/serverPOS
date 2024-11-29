@@ -1,7 +1,8 @@
-const React = require('react');
+import React from 'react';
+import {MainNavigator} from './routes/MainNavigator';
 
 const App = () => {
-    return <h1>Hello from SSR!</h1>;
+    return <MainNavigator />;
 };
 
-module.exports = App;
+export default App;
