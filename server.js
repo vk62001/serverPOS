@@ -34,6 +34,11 @@ app.use(express.static("public"));
 
 app.use("/api/", apiRouter);
 
+
+app.get("/monitor/*", async (req, res) => { // renderizar todas las rutas de /monitor
+  
+});
+
 app.get("/", async (req, res) => {
 
   const query = await getTable("sqt_configuracion");
